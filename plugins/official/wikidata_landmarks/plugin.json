@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "wikidata_landmarks",
-  "version": 1,
-  "name": "Notable places (Wikidata)",
+  "version": 2,
+  "name": "Notable places",
   "description": "Heritage sites, monuments, buildings, museums and other notable things with coordinates near you.",
   "author": "Omniscope",
   "source": "Wikidata Query Service",

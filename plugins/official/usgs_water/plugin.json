@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "usgs_water",
-  "version": 1,
-  "name": "Stream gauges (USGS)",
+  "version": 2,
+  "name": "Stream gauges",
   "description": "Live river flow and water level readings from USGS stream gauges; US only.",
   "author": "Omniscope",
   "source": "USGS National Water Information System",

@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "safecast",
-  "version": 1,
-  "name": "Radiation readings (Safecast)",
+  "version": 2,
+  "name": "Radiation",
   "description": "Citizen-science radiation measurements from Safecast detectors, worldwide but densest in Japan, the US and Europe.",
   "author": "Omniscope",
   "source": "Safecast",

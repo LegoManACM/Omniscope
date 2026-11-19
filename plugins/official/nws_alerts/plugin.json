@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "nws_alerts",
-  "version": 1,
-  "name": "Weather alerts (US)",
+  "version": 2,
+  "name": "Weather alerts",
   "description": "Active US National Weather Service watches, warnings and advisories for your location. US only; no cards when nothing is active.",
   "author": "Omniscope",
   "source": "US National Weather Service",

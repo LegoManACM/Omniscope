@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "us_census_area",
-  "version": 1,
-  "name": "Census area (US)",
+  "version": 2,
+  "name": "Census area",
   "description": "The county, census tract, congressional and legislative districts you are in; United States only.",
   "author": "Omniscope",
   "source": "US Census Bureau Geocoder",

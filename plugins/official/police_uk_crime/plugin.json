@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "police_uk_crime",
-  "version": 1,
-  "name": "Street crime (UK)",
+  "version": 2,
+  "name": "Street crime",
   "description": "Recorded street-level crimes within about a mile of you, latest published month; England, Wales and Northern Ireland only.",
   "author": "Omniscope",
   "source": "data.police.uk",

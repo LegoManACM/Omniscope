@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "space_weather",
-  "version": 1,
-  "name": "Space weather (Kp)",
+  "version": 2,
+  "name": "Space weather",
   "description": "Latest planetary Kp geomagnetic index. Kp 5 or more is a geomagnetic storm; aurora reaches lower latitudes as Kp rises.",
   "author": "Omniscope",
   "source": "NOAA SWPC",

@@ -25,7 +25,17 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.camera.camera2.interop.Camera2CameraInfo
+import androidx.camera.camera2.interop.ExperimentalCamera2Interop
+import androidx.camera.core.Camera
+import androidx.camera.core.CameraInfo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,28 +101,34 @@ import kotlin.math.tan
 /** Field of view of the back camera along the sensor's long and short sides, in degrees. */
 private data class Fov(val longDeg: Double, val shortDeg: Double)
 
-private fun backCameraFov(context: android.content.Context): Fov {
-    val cm = context.getSystemService(CameraManager::class.java)
-    for (id in cm.cameraIdList) {
-        val ch = cm.getCameraCharacteristics(id)
-        if (ch.get(CameraCharacteristics.LENS_FACING) != CameraCharacteristics.LENS_FACING_BACK) continue
-        val focal = ch.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)?.firstOrNull() ?: continue
-        val size = ch.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE) ?: continue
-        fun fov(mm: Float) = Math.toDegrees(2 * atan(mm / (2.0 * focal)))
-        return Fov(fov(max(size.width, size.height)), fov(min(size.width, size.height)))
-    }
-    return Fov(66.0, 51.0)
-}
+/** Field of view of one camera (by Camera2 id), from its focal length and sensor size. */
+private fun cameraFov(context: android.content.Context, id: String): Fov? = runCatching {
+    val ch = context.getSystemService(CameraManager::class.java).getCameraCharacteristics(id)
+    val focal = ch.get(CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS)?.minOrNull() ?: return null
+    val size = ch.get(CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE) ?: return null
+    fun fov(mm: Float) = Math.toDegrees(2 * atan(mm / (2.0 * focal)))
+    Fov(fov(max(size.width, size.height)), fov(min(size.width, size.height)))
+}.getOrNull()
+
+/** The camera actually bound: its field of view at zoom 1, and the other back cameras the phone offers. */
+private class Bound(val camera: Camera, val cameraId: String, val fov: Fov, val backCameras: List<Pair<String, Fov>>)
+
+/** A lens button: a zoom ratio on the default back camera, or a separate physical camera (ultra-wide on some phones). */
+private data class Lens(val label: String, val zoom: Float, val cameraId: String?)
+
+@androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
+private fun idOf(info: CameraInfo): String = Camera2CameraInfo.from(info).cameraId
 
 /** Camera preview, plus frame analysis for scan mode while [analyzer] is set. Both use 4:3 so boxes line up. */
 @Composable
-private fun CameraPreview(analyzer: ImageAnalysis.Analyzer?, modifier: Modifier = Modifier) {
+@androidx.annotation.OptIn(ExperimentalCamera2Interop::class)
+private fun CameraPreview(analyzer: ImageAnalysis.Analyzer?, cameraId: String?, onBound: (Bound) -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val owner = LocalLifecycleOwner.current
     val view = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER } }
     val executor = remember { Executors.newSingleThreadExecutor() }
     AndroidView(factory = { view }, modifier = modifier)
-    DisposableEffect(owner, analyzer) {
+    DisposableEffect(owner, analyzer, cameraId) {
         val ratio = ResolutionSelector.Builder().setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY).build()
         val future = ProcessCameraProvider.getInstance(context)
         var provider: ProcessCameraProvider? = null
@@ -120,15 +136,21 @@ private fun CameraPreview(analyzer: ImageAnalysis.Analyzer?, modifier: Modifier 
             provider = future.get().also { p ->
                 val preview = Preview.Builder().setResolutionSelector(ratio).build().also { it.setSurfaceProvider(view.surfaceProvider) }
                 p.unbindAll()
+                val selector = if (cameraId == null) CameraSelector.DEFAULT_BACK_CAMERA
+                    else CameraSelector.Builder().addCameraFilter { infos -> infos.filter { idOf(it) == cameraId } }.build()
                 runCatching {
-                    if (analyzer != null) {
+                    val camera = if (analyzer != null) {
                         val analysis = ImageAnalysis.Builder().setResolutionSelector(ratio)
                             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
                             .also { it.setAnalyzer(executor, analyzer) }
-                        p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview, analysis)
+                        p.bindToLifecycle(owner, selector, preview, analysis)
                     } else {
-                        p.bindToLifecycle(owner, CameraSelector.DEFAULT_BACK_CAMERA, preview)
+                        p.bindToLifecycle(owner, selector, preview)
                     }
+                    val id = idOf(camera.cameraInfo)
+                    val backs = p.availableCameraInfos.filter { it.lensFacing == CameraSelector.LENS_FACING_BACK }
+                        .mapNotNull { info -> idOf(info).let { i -> cameraFov(context, i)?.let { i to it } } }
+                    onBound(Bound(camera, id, cameraFov(context, id) ?: Fov(66.0, 51.0), backs))
                 }
             }
         }, ContextCompat.getMainExecutor(context))
@@ -332,7 +354,26 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
     val frameSize by app.scan.frameSize.collectAsState()
     val products by app.scan.products.collectAsState()
     val outlines by app.buildingOutlines.collectAsState()
-    val fov = remember { backCameraFov(context) }
+    // Lenses: zoom ratio on the default camera, or a separate (ultra-wide) camera when the default can't go below 1x.
+    var bound by remember { mutableStateOf<Bound?>(null) }
+    var cameraId by remember { mutableStateOf<String?>(null) }
+    var zoom by remember { mutableFloatStateOf(1f) }
+    var zoomRange by remember { mutableStateOf(1f..1f) }
+    var pendingZoom by remember { mutableStateOf<Float?>(null) }
+    val owner = LocalLifecycleOwner.current
+    DisposableEffect(bound) {
+        val b = bound
+        val obs = androidx.lifecycle.Observer<androidx.camera.core.ZoomState> { zs -> zoom = zs.zoomRatio; zoomRange = zs.minZoomRatio..zs.maxZoomRatio }
+        b?.camera?.cameraInfo?.zoomState?.observe(owner, obs)
+        pendingZoom?.let { z -> b?.camera?.cameraControl?.setZoomRatio(z); pendingZoom = null }
+        onDispose { b?.camera?.cameraInfo?.zoomState?.removeObserver(obs) }
+    }
+    val fov = bound?.fov ?: Fov(66.0, 51.0)
+    val lenses = remember(bound, zoomRange) { lensOptions(bound, zoomRange, cameraId) }
+    fun selectLens(l: Lens) {
+        if (l.cameraId != cameraId) { cameraId = l.cameraId; pendingZoom = l.zoom }
+        else bound?.camera?.cameraControl?.setZoomRatio(l.zoom.coerceIn(zoomRange.start, zoomRange.endInclusive))
+    }
 
     val declination = remember(fix?.let { Geo.round4(it.lat * 10) }, fix?.let { Geo.round4(it.lon * 10) }) {
         fix?.let { OrientationSource.declination(it) } ?: 0f
@@ -345,12 +386,12 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
     val scratch = remember { WireScratch() }
 
     // Targeting runs ~15 times a second, with a short dwell so the reticle doesn't flicker between neighbours.
-    LaunchedEffect(points, wires, totalOffset, viewSize) {
+    LaunchedEffect(points, wires, totalOffset, viewSize, zoom, fov) {
         var candidate: String? = null; var since = 0L; var lostSince = 0L
         while (true) {
             val r = app.orientation.rotation.value
             if (r != null && viewSize.width > 0) {
-                val proj = Proj(r, totalOffset, focal(viewSize, fov), viewSize.width / 2f, viewSize.height / 2f)
+                val proj = Proj(r, totalOffset, focal(viewSize, fov) * zoom, viewSize.width / 2f, viewSize.height / 2f)
                 val picked = pick(proj, points, wires, target)
                 val now = System.currentTimeMillis()
                 when {
@@ -383,9 +424,18 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
     val glowAlpha by glow.animateFloat(0.55f, 1f, infiniteRepeatable(tween(1400), RepeatMode.Reverse), label = "alpha")
 
     Box(Modifier.fillMaxSize().background(Color.Black).onSizeChanged { viewSize = it }) {
-        CameraPreview(if (scanMode) app.scan else null, Modifier.fillMaxSize())
+        CameraPreview(if (scanMode) app.scan else null, cameraId, onBound = { bound = it }, modifier = Modifier.fillMaxSize())
 
+        val currentBound by androidx.compose.runtime.rememberUpdatedState(bound)
+        val currentRange by androidx.compose.runtime.rememberUpdatedState(zoomRange)
+        val currentZoom by androidx.compose.runtime.rememberUpdatedState(zoom)
         Canvas(Modifier.fillMaxSize().pointerInput(Unit) {
+            // Pinch to zoom within what the bound camera supports.
+            detectTransformGestures { _, _, change, _ ->
+                if (change != 1f) currentBound?.camera?.cameraControl?.setZoomRatio(
+                    (currentZoom * change).coerceIn(currentRange.start, currentRange.endInclusive))
+            }
+        }.pointerInput(Unit) {
             detectTapGestures(
                 onLongPress = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -404,7 +454,7 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
             val r = rot ?: return@Canvas
             val nc = drawContext.canvas.nativeCanvas
             val w = size.width; val h = size.height
-            val proj = Proj(r, totalOffset, focal(IntSize(w.toInt(), h.toInt()), fov), w / 2, h / 2)
+            val proj = Proj(r, totalOffset, focal(IntSize(w.toInt(), h.toInt()), fov) * zoom, w / 2, h / 2)
             val cx = w / 2; val cy = h / 2
             val dp = density
 
@@ -555,8 +605,10 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
             }
         }
 
-        // Bottom: filter button and the target's card.
-        Row(Modifier.align(Alignment.BottomCenter).fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.Bottom,
+        // Bottom: lens picker, then the filter button and the target's card.
+        Column(Modifier.align(Alignment.BottomCenter).fillMaxWidth()) {
+        if (lenses.size > 1) LensBar(lenses, zoom, cameraId, ::selectLens, Modifier.align(Alignment.CenterHorizontally))
+        Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             FilterButton(app, onFilter)
             Box(Modifier.weight(1f)) {
@@ -565,6 +617,51 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
                     target?.let { shown = it }
                     shown?.let { ItemCard(app, it, fix) { app.opened.value = it } }
                 }
+            }
+        }
+        }
+    }
+}
+
+private fun ratioLabel(z: Double): String = "%.1f".format(java.util.Locale.US, z).removeSuffix(".0")
+
+/**
+ * Lens buttons: an ultra-wide (zoom below 1 on the default camera, or a separate wider camera), 1x, and zoom steps
+ * the camera supports.
+ */
+private fun lensOptions(bound: Bound?, range: ClosedFloatingPointRange<Float>, selectedId: String?): List<Lens> {
+    bound ?: return emptyList()
+    val onDefault = selectedId == null
+    val out = mutableListOf<Lens>()
+    if (onDefault && range.start < 0.95f) {
+        out += Lens(ratioLabel(range.start.toDouble()), range.start, null)
+    } else {
+        // No zoom below 1 on the default camera: offer the widest other back camera, if it's meaningfully wider.
+        val reference = if (onDefault) bound.fov else bound.backCameras.minByOrNull { it.second.longDeg }?.second
+        val wide = bound.backCameras.maxByOrNull { it.second.longDeg }
+        if (reference != null && wide != null && wide.second.longDeg > reference.longDeg * 1.25) {
+            val ratio = tan(Math.toRadians(reference.longDeg / 2)) / tan(Math.toRadians(wide.second.longDeg / 2))
+            out += Lens(ratioLabel(ratio), 1f, wide.first)
+        }
+    }
+    out += Lens("1", 1f, null)
+    if (onDefault) for (z in listOf(2f, 5f, 10f)) if (z <= range.endInclusive + 0.01f) out += Lens(ratioLabel(z.toDouble()), z, null)
+    return out
+}
+
+@Composable
+private fun LensBar(lenses: List<Lens>, zoom: Float, cameraId: String?, onSelect: (Lens) -> Unit, modifier: Modifier = Modifier) {
+    // The active button is on the bound camera, with the zoom closest to the current one.
+    val active = lenses.filter { it.cameraId == cameraId }.minByOrNull { kotlin.math.abs(it.zoom - zoom) }
+    Row(modifier.background(Color(0x99121416), RoundedCornerShape(24.dp)).padding(4.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        lenses.forEach { l ->
+            val on = l == active
+            // While pinching, the active button shows the live zoom.
+            val label = if (on && l.cameraId == null && kotlin.math.abs(zoom - l.zoom) > 0.05f) ratioLabel(zoom.toDouble()) else l.label
+            Box(Modifier.size(40.dp).clip(CircleShape).background(if (on) Color(0xE6FFFFFF) else Color(0x33FFFFFF))
+                .clickable { onSelect(l) }, contentAlignment = Alignment.Center) {
+                Text(label + if (on) "x" else "", color = if (on) Color.Black else Color.White, fontSize = 12.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
             }
         }
     }

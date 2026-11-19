@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "elevation",
-  "version": 1,
-  "name": "Ground elevation",
+  "version": 2,
+  "name": "Elevation",
   "description": "Height of the ground above sea level at your location.",
   "author": "Omniscope",
   "source": "Open-Meteo (Copernicus DEM)",

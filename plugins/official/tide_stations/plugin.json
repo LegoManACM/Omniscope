@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "tide_stations",
-  "version": 1,
-  "name": "Tide stations (NOAA)",
+  "version": 2,
+  "name": "Tide stations",
   "description": "NOAA tide prediction stations on US coasts and territories; nothing inland.",
   "author": "Omniscope",
   "source": "NOAA CO-OPS",

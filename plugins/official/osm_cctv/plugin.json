@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "osm_cctv",
-  "version": 1,
-  "name": "Surveillance cameras",
+  "version": 2,
+  "name": "CCTV cameras",
   "description": "CCTV and surveillance cameras mapped in OpenStreetMap, excluding licence plate readers.",
   "author": "Omniscope",
   "source": "OpenStreetMap via Overpass",

@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "panoramax",
-  "version": 1,
-  "name": "Street-level photos",
+  "version": 2,
+  "name": "Street photos",
   "description": "Open street-level photos from Panoramax near you (coverage varies, strongest in France and Europe).",
   "author": "Omniscope",
   "source": "Panoramax",

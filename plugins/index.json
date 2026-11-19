@@ -3,8 +3,8 @@
   "plugins": [
     {
       "id": "gbif_occurrences",
-      "name": "Species records (GBIF)",
-      "version": 1,
+      "name": "Species records",
+      "version": 2,
       "description": "Recorded sightings and specimens of plants, animals and fungi near you, from museums, surveys and citizen science.",
       "author": "Omniscope (example community plugin)",
       "category": "nature",
@@ -16,7 +16,7 @@
       ],
       "official": false,
       "path": "plugins/community/gbif_occurrences/plugin.json",
-      "sha256": "cf07973b7d28b6325677155c2b76d10068cab458f70680f15bdd28eaf5e51fe2",
+      "sha256": "fcbe2ca6ecc012f1129f5ab225ffac307410ea2fb905f75b91023b1b5b896253",
       "hosts": [
         "api.gbif.org"
       ]
@@ -102,8 +102,8 @@
     },
     {
       "id": "elevation",
-      "name": "Ground elevation",
-      "version": 1,
+      "name": "Elevation",
+      "version": 2,
       "description": "Height of the ground above sea level at your location.",
       "author": "Omniscope",
       "category": "terrain",
@@ -116,15 +116,15 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/elevation/plugin.json",
-      "sha256": "3584cd065569e413df9056146092be1624021732bfaa979468a8d656cc5df582",
+      "sha256": "0b41adb9dc0990405d240bfd325b5c20ae7d1061a29b6e3fbdd9f09b8430a960",
       "hosts": [
         "api.open-meteo.com"
       ]
     },
     {
       "id": "eonet_events",
-      "name": "Natural events (NASA EONET)",
-      "version": 1,
+      "name": "Natural events",
+      "version": 2,
       "description": "Open wildfires, storms, volcanoes, floods and other natural events tracked by NASA, worldwide.",
       "author": "Omniscope",
       "category": "hazards",
@@ -141,15 +141,15 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/eonet_events/plugin.json",
-      "sha256": "aa58e0bad5c16055492e47f2c79d85cd174b4ce4274f14fda6d80dcad0e8b721",
+      "sha256": "e76a1a554c175ff5a46be77d2901c1d8dbe3ec5cebe2a909c14c1ae6e7c931ca",
       "hosts": [
         "eonet.gsfc.nasa.gov"
       ]
     },
     {
       "id": "fossils",
-      "name": "Fossil finds (PBDB)",
-      "version": 1,
+      "name": "Fossils",
+      "version": 2,
       "description": "Fossil occurrences recorded in the Paleobiology Database, with their geological age; worldwide, up to 200 per search.",
       "author": "Omniscope",
       "category": "terrain",
@@ -165,7 +165,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/fossils/plugin.json",
-      "sha256": "ebca386bdec26de6132f6e97bee2c11337b2ae63d88509d4b5b13243bbadbd82",
+      "sha256": "38df08f9f3123c1b004a11eedc477d124f190e0d4094810c8b64d5afa696c06e",
       "hosts": [
         "paleobiodb.org"
       ]
@@ -256,8 +256,8 @@
     },
     {
       "id": "nws_alerts",
-      "name": "Weather alerts (US)",
-      "version": 1,
+      "name": "Weather alerts",
+      "version": 2,
       "description": "Active US National Weather Service watches, warnings and advisories for your location. US only; no cards when nothing is active.",
       "author": "Omniscope",
       "category": "hazards",
@@ -272,15 +272,15 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/nws_alerts/plugin.json",
-      "sha256": "a451a2b6bc8db236c418f142aad99cdda6bc896226431ecb29e12f38df141567",
+      "sha256": "244db842b81d67615a6bd32e9aeb4f87bf889e46f6b952c2ef7d66823aafb0c4",
       "hosts": [
         "api.weather.gov"
       ]
     },
     {
       "id": "opensky",
-      "name": "Aircraft (OpenSky)",
-      "version": 1,
+      "name": "Air traffic",
+      "version": 2,
       "description": "Live aircraft positions from the OpenSky Network; anonymous access is limited to about 400 requests a day, so use it sparingly.",
       "author": "Omniscope",
       "category": "transport",
@@ -295,15 +295,15 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/opensky/plugin.json",
-      "sha256": "a0ea0cd6f5f48805578a3247b8d5b28bdf4db74706520f339c971ff79b431412",
+      "sha256": "92db157145fc903c6bcbe1f071aef0f96abeab27c295b46a91c49173a7b1cd3f",
       "hosts": [
         "opensky-network.org"
       ]
     },
     {
       "id": "osm_cctv",
-      "name": "Surveillance cameras",
-      "version": 1,
+      "name": "CCTV cameras",
+      "version": 2,
       "description": "CCTV and surveillance cameras mapped in OpenStreetMap, excluding licence plate readers.",
       "author": "Omniscope",
       "category": "surveillance",
@@ -317,7 +317,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/osm_cctv/plugin.json",
-      "sha256": "97d425fd09cc03206caa4e0e04e85dc5c6222ea44998f25ccbc1af91c26d8192",
+      "sha256": "52783185b969ba37b47556df29f5b73336165b63f2ff2b2b80403e296fb90fcb",
       "hosts": [
         "overpass-api.de",
         "overpass.private.coffee"
@@ -325,8 +325,8 @@
     },
     {
       "id": "osm_defibrillators",
-      "name": "Defibrillators (AED)",
-      "version": 1,
+      "name": "Defibrillators",
+      "version": 2,
       "description": "Public automated external defibrillators.",
       "author": "Omniscope",
       "category": "places",
@@ -340,7 +340,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/osm_defibrillators/plugin.json",
-      "sha256": "ff1591be1cc75bb8ae4d402d303df390b3ef69bd971a25cc0c9bf8a645889b4a",
+      "sha256": "21264bd48caad120e97ff99b7994f87997123bfbfbf968ba839f12649c8d2f05",
       "hosts": [
         "overpass-api.de",
         "overpass.private.coffee"
@@ -506,8 +506,8 @@
     },
     {
       "id": "osm_viewpoints",
-      "name": "Viewpoints and waterfalls",
-      "version": 1,
+      "name": "Viewpoints",
+      "version": 2,
       "description": "Scenic viewpoints and waterfalls.",
       "author": "Omniscope",
       "category": "terrain",
@@ -522,7 +522,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/osm_viewpoints/plugin.json",
-      "sha256": "afaf748450dcdea4a3b3eee00ac9d6646e4a81ad1ace9425e11d45c7b1f68879",
+      "sha256": "504dfb6fa48f6141938f30628370b2e0698eb93f82e6f44b6e43a1519f596ebb",
       "hosts": [
         "overpass-api.de",
         "overpass.private.coffee"
@@ -530,8 +530,8 @@
     },
     {
       "id": "panoramax",
-      "name": "Street-level photos",
-      "version": 1,
+      "name": "Street photos",
+      "version": 2,
       "description": "Open street-level photos from Panoramax near you (coverage varies, strongest in France and Europe).",
       "author": "Omniscope",
       "category": "media",
@@ -545,7 +545,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/panoramax/plugin.json",
-      "sha256": "1362839ab674028b8e443da313f897e99f6761af66f989e448f5d3ce550a302f",
+      "sha256": "bedd2a476f0005599e8a58a905a4071f409140d18faf1bdaf621f75213a7da4a",
       "hosts": [
         "api.panoramax.xyz"
       ]
@@ -612,8 +612,8 @@
     },
     {
       "id": "police_uk_crime",
-      "name": "Street crime (UK)",
-      "version": 1,
+      "name": "Street crime",
+      "version": 2,
       "description": "Recorded street-level crimes within about a mile of you, latest published month; England, Wales and Northern Ireland only.",
       "author": "Omniscope",
       "category": "hazards",
@@ -627,7 +627,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/police_uk_crime/plugin.json",
-      "sha256": "576c99a861e16581027ee41871dc4becd0fb5ba5b73c560255078f35db750b1a",
+      "sha256": "402f991bc5454535d07cf8f4650995ab881ae3a5e44e0a916c06cc64de0379d8",
       "hosts": [
         "data.police.uk"
       ]
@@ -696,8 +696,8 @@
     },
     {
       "id": "safecast",
-      "name": "Radiation readings (Safecast)",
-      "version": 1,
+      "name": "Radiation",
+      "version": 2,
       "description": "Citizen-science radiation measurements from Safecast detectors, worldwide but densest in Japan, the US and Europe.",
       "author": "Omniscope",
       "category": "hazards",
@@ -712,7 +712,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/safecast/plugin.json",
-      "sha256": "483eb9c78709300458e476efdfa19dcdf6f427fed79b51db978543bc91e88585",
+      "sha256": "26fb6f67e2a245cc7277a217f4488ad8e9bfdac001c46ae0325efddeabdce470",
       "hosts": [
         "api.safecast.org"
       ]
@@ -810,8 +810,8 @@
     },
     {
       "id": "space_weather",
-      "name": "Space weather (Kp)",
-      "version": 1,
+      "name": "Space weather",
+      "version": 2,
       "description": "Latest planetary Kp geomagnetic index. Kp 5 or more is a geomagnetic storm; aurora reaches lower latitudes as Kp rises.",
       "author": "Omniscope",
       "category": "sky",
@@ -825,7 +825,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/space_weather/plugin.json",
-      "sha256": "e64ac3252c0e70f85d87cf2af55be9315ea62f4d56211c77ab72bdb4ccb01482",
+      "sha256": "7996f48aa905b64c7d24aa579180853617044be756cc3eaa8dd8cf77cca21ea3",
       "hosts": [
         "services.swpc.noaa.gov"
       ]
@@ -854,8 +854,8 @@
     },
     {
       "id": "tide_stations",
-      "name": "Tide stations (NOAA)",
-      "version": 1,
+      "name": "Tide stations",
+      "version": 2,
       "description": "NOAA tide prediction stations on US coasts and territories; nothing inland.",
       "author": "Omniscope",
       "category": "nature",
@@ -870,7 +870,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/tide_stations/plugin.json",
-      "sha256": "2b13d1b82954db139f88ae6990a028d382a8daba2e7ebbb2bcdf398f75acfe3b",
+      "sha256": "929c6e2921704dcb2b52e0cf71aac8db675005fd15b030eb4061ba9d0f864e09",
       "hosts": [
         "api.tidesandcurrents.noaa.gov",
         "tidesandcurrents.noaa.gov"
@@ -878,8 +878,8 @@
     },
     {
       "id": "us_census_area",
-      "name": "Census area (US)",
-      "version": 1,
+      "name": "Census area",
+      "version": 2,
       "description": "The county, census tract, congressional and legislative districts you are in; United States only.",
       "author": "Omniscope",
       "category": "places",
@@ -893,15 +893,15 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/us_census_area/plugin.json",
-      "sha256": "08067a1c5d9fcdff4ed08f68f90223d5783e0809337777d6ec5f4769fc34eb60",
+      "sha256": "007944cf7df055519b0710cf79c72ae09c75d8fa0be223c8e0b96a59097ac5c3",
       "hosts": [
         "geocoding.geo.census.gov"
       ]
     },
     {
       "id": "usgs_water",
-      "name": "Stream gauges (USGS)",
-      "version": 1,
+      "name": "Stream gauges",
+      "version": 2,
       "description": "Live river flow and water level readings from USGS stream gauges; US only.",
       "author": "Omniscope",
       "category": "hazards",
@@ -917,7 +917,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/usgs_water/plugin.json",
-      "sha256": "d4f6851e17315a608b13eefbf8d3e80bf53b61c5ba4c2f4aa16792b3cad726fe",
+      "sha256": "7eed4247105ca4070c0fd8518aa2d7d03ca0a9390fa72e302fa4b18cc0a28a52",
       "hosts": [
         "waterservices.usgs.gov"
       ]
@@ -962,8 +962,8 @@
     },
     {
       "id": "wikidata_landmarks",
-      "name": "Notable places (Wikidata)",
-      "version": 1,
+      "name": "Notable places",
+      "version": 2,
       "description": "Heritage sites, monuments, buildings, museums and other notable things with coordinates near you.",
       "author": "Omniscope",
       "category": "history",
@@ -977,7 +977,7 @@
       "preload": false,
       "official": true,
       "path": "plugins/official/wikidata_landmarks/plugin.json",
-      "sha256": "ecfa769a9405621a313d734fb4d6767691defc0e0f14579bdcaab468a7b6f565",
+      "sha256": "a1909132f8433115b30ec4d460e24c6878bd4cabecb5677355ae8251b5d9a95c",
       "hosts": [
         "query.wikidata.org"
       ]

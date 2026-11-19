@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "osm_viewpoints",
-  "version": 1,
-  "name": "Viewpoints and waterfalls",
+  "version": 2,
+  "name": "Viewpoints",
   "description": "Scenic viewpoints and waterfalls.",
   "author": "Omniscope",
   "source": "OpenStreetMap via Overpass",

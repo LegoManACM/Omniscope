@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "osm_defibrillators",
-  "version": 1,
-  "name": "Defibrillators (AED)",
+  "version": 2,
+  "name": "Defibrillators",
   "description": "Public automated external defibrillators.",
   "author": "Omniscope",
   "source": "OpenStreetMap via Overpass",

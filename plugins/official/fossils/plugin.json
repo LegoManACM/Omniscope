@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "fossils",
-  "version": 1,
-  "name": "Fossil finds (PBDB)",
+  "version": 2,
+  "name": "Fossils",
   "description": "Fossil occurrences recorded in the Paleobiology Database, with their geological age; worldwide, up to 200 per search.",
   "author": "Omniscope",
   "source": "Paleobiology Database",

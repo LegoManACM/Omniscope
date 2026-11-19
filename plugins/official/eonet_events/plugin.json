@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "eonet_events",
-  "version": 1,
-  "name": "Natural events (NASA EONET)",
+  "version": 2,
+  "name": "Natural events",
   "description": "Open wildfires, storms, volcanoes, floods and other natural events tracked by NASA, worldwide.",
   "author": "Omniscope",
   "source": "NASA EONET",

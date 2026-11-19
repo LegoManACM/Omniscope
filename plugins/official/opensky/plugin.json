@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "opensky",
-  "version": 1,
-  "name": "Aircraft (OpenSky)",
+  "version": 2,
+  "name": "Air traffic",
   "description": "Live aircraft positions from the OpenSky Network; anonymous access is limited to about 400 requests a day, so use it sparingly.",
   "author": "Omniscope",
   "source": "OpenSky Network",

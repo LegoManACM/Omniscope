@@ -1,8 +1,8 @@
 {
   "format": 1,
   "id": "gbif_occurrences",
-  "version": 1,
-  "name": "Species records (GBIF)",
+  "version": 2,
+  "name": "Species records",
   "description": "Recorded sightings and specimens of plants, animals and fungi near you, from museums, surveys and citizen science.",
   "author": "Omniscope (example community plugin)",
   "source": "GBIF, the Global Biodiversity Information Facility",

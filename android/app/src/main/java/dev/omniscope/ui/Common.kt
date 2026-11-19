@@ -122,8 +122,9 @@ fun ItemCard(app: App, item: Item, fix: Fix?, modifier: Modifier = Modifier, onO
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     PhIcon(plugin.icon, c, 16.dp)
                     Spacer(Modifier.width(6.dp))
-                    Text(plugin.name.uppercase(), color = c, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.8.sp)
-                    item.distanceFrom(fix)?.let { Text("  ·  ${Geo.fmtDistance(it)}", color = Color(0xFFAAAAAA), fontSize = 11.sp) }
+                    Text(plugin.name.uppercase(), color = c, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 0.8.sp,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                    item.distanceFrom(fix)?.let { Text("  ·  ${Geo.fmtDistance(it)}", color = Color(0xFFAAAAAA), fontSize = 11.sp, maxLines = 1, softWrap = false) }
                 }
                 Text(item.title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 4.dp))

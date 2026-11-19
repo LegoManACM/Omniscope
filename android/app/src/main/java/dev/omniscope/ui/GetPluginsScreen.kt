@@ -126,7 +126,8 @@ private fun CatalogRow(e: CatalogEntry, status: EntryStatus, busy: String?, onIn
         Box(Modifier.size(44.dp).clip(CircleShape).background(c.copy(alpha = 0.18f)), contentAlignment = Alignment.Center) { PhIcon(e.icon, c, 24.dp) }
         Column(Modifier.weight(1f).padding(horizontal = 12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(e.name, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(e.name, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false))
                 if (e.official) OfficialBadge()
             }
             Text(listOfNotNull(e.category.label, e.cost.label.takeIf { e.cost != Cost.FREE }, e.author.ifBlank { null }?.let { "by $it" },

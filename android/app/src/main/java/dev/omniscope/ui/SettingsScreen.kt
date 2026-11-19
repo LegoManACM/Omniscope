@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -184,7 +185,7 @@ private fun PluginTile(p: Plugin, on: Boolean, missingKey: Boolean, metered: Boo
             }
         }
         Text(p.name, color = if (on) Color.White else Color(0xFF8A8A8A), fontSize = 11.sp, textAlign = TextAlign.Center, maxLines = 2,
-            lineHeight = 13.sp, modifier = Modifier.padding(top = 4.dp).height(28.dp))
+            overflow = TextOverflow.Ellipsis, lineHeight = 13.sp, modifier = Modifier.fillMaxWidth().padding(top = 4.dp).height(28.dp))
     }
 }
 
@@ -205,7 +206,8 @@ private fun PluginSheet(app: App, p: Plugin, onDismiss: () -> Unit) {
                 PluginBadge(p, 48.dp)
                 Column(Modifier.weight(1f).padding(start = 14.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(p.name, style = MaterialTheme.typography.titleLarge)
+                        Text(p.name, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false))
                         if (meta?.official == true) OfficialBadge()
                     }
                     Text("${p.category.label} · ${p.cost.label}${if (p.key != null) " · needs a key" else ""}", color = p.color, fontSize = 13.sp)
