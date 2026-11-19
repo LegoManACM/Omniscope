@@ -1,4 +1,4 @@
-# FreeApiExplorer: design
+# Omniscope: design
 
 A native Android app that shows everything free data sources know about where you are and what you're
 pointing at. Plugins provide the data. The app renders it as **AR**, a **map** or a **list**, and later serves it

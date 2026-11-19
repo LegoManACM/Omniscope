@@ -1,4 +1,4 @@
-# FreeApiExplorer
+# Omniscope
 
 An Android app that shows what free data sources know about where you are and what you're pointing at, as
 **AR** (camera view with a reticle you aim at things), a **map**, a **list**, and an **MCP server** that Claude and

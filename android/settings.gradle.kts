@@ -14,5 +14,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "free-api-explorer"
+rootProject.name = "omniscope"
 include(":app")

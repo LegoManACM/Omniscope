@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.freeapi.explorer"
+    namespace = "dev.omniscope"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "dev.freeapi.explorer"
+        applicationId = "dev.omniscope"
         minSdk = 29
         targetSdk = 36
         versionCode = 1

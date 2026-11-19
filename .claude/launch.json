@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "free-api-explorer",
+      "name": "omniscope",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["C:/Users/afrik/Github/FreeApiExplorer/demo/server.py"],
+      "runtimeArgs": ["C:/Users/afrik/Github/Omniscope/demo/server.py"],
       "port": 8765
     }
   ]

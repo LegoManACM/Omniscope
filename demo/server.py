@@ -1,4 +1,4 @@
-"""Tiny local server for the Free API Explorer demo.
+"""Tiny local server for the Omniscope demo.
 
 Serves the static page and proxies GET requests to an allowlist of keyless
 APIs (avoids CORS issues, sets a proper User-Agent, caches for 5 minutes).
@@ -17,7 +17,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 PORT = int(os.environ.get("PORT", "8765"))
 ROOT = os.path.dirname(os.path.abspath(__file__))
-UA = "free-api-explorer-demo/0.1 (local prototype)"
+UA = "omniscope-demo/0.1 (local prototype)"
 CACHE_TTL = 300
 _cache: dict[str, tuple[float, int, str, bytes]] = {}
 
@@ -114,5 +114,5 @@ class Handler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     server = ThreadingHTTPServer(("127.0.0.1", PORT), functools.partial(Handler, directory=ROOT))
-    print(f"Free API Explorer on http://localhost:{PORT}", flush=True)
+    print(f"Omniscope on http://localhost:{PORT}", flush=True)
     server.serve_forever()
