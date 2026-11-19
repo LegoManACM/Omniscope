@@ -109,29 +109,38 @@ class PluginStore(private val context: Context, private val http: Http) {
 
     private fun saveSources() = prefs.edit().putString("sources", sources.value.joinToString("\n")).apply()
 
+    /** The latest commit of [repo]'s default branch and its plugins/index.json (null if that commit has none). */
+    private suspend fun readIndex(repo: String, shaTtlMs: Long): Pair<String, JSONObject?> {
+        val sha = try {
+            http.text("https://api.github.com/repos/$repo/commits/HEAD", shaTtlMs, mapOf("Accept" to "application/vnd.github.sha")).trim()
+        } catch (e: HttpException) {
+            throw Exception(when (e.code) {
+                404, 422 -> "no such public repo on GitHub"
+                403, 429 -> "GitHub's rate limit (60 checks an hour without an account); try again later"
+                else -> "GitHub said ${e.code}"
+            })
+        }
+        if (!Regex("^[0-9a-f]{40}$").matches(sha)) throw Exception("couldn't read the latest commit")
+        val index = try {
+            JSONObject(http.text("https://raw.githubusercontent.com/$repo/$sha/plugins/index.json", 30L * 24 * 3_600_000L))
+        } catch (e: HttpException) {
+            if (e.code == 404) null else throw e
+        }
+        return sha to index
+    }
+
     /** Every source's index, newest commit on its default branch. Errors per source are returned alongside. */
     suspend fun catalog(force: Boolean = false): Pair<List<CatalogEntry>, Map<String, String>> {
         val entries = mutableListOf<CatalogEntry>()
         val errors = mutableMapOf<String, String>()
         for (repo in sources.value) {
             try {
-                // The commit sha pins everything read from this repo for this listing.
-                val sha = try {
-                    http.text("https://api.github.com/repos/$repo/commits/HEAD", if (force) 0 else 10 * 60_000L,
-                        mapOf("Accept" to "application/vnd.github.sha")).trim()
-                } catch (e: HttpException) {
-                    throw Exception(when (e.code) {
-                        404, 422 -> "no such public repo on GitHub"
-                        403, 429 -> "GitHub's rate limit (60 checks an hour without an account); try again later"
-                        else -> "GitHub said ${e.code}"
-                    })
-                }
-                if (!Regex("^[0-9a-f]{40}$").matches(sha)) throw Exception("couldn't read the latest commit")
-                val index = try {
-                    JSONObject(http.text("https://raw.githubusercontent.com/$repo/$sha/plugins/index.json", 30L * 24 * 3_600_000L))
-                } catch (e: HttpException) {
-                    if (e.code == 404) throw Exception("this repo has no plugins/index.json on its main branch") else throw e
-                }
+                // The commit sha pins everything read from this repo for this listing. It's cached briefly (GitHub allows
+                // 60 unauthenticated checks an hour); if the cached commit turns out to have no index, check again fresh.
+                var read = readIndex(repo, if (force) 0 else 60_000L)
+                if (read.second == null && !force) read = readIndex(repo, 0)
+                val sha = read.first
+                val index = read.second ?: throw Exception("this repo has no plugins/index.json on its main branch")
                 val list = index.optJSONArray("plugins") ?: JSONArray()
                 for (i in 0 until list.length()) {
                     val e = list.optJSONObject(i) ?: continue
