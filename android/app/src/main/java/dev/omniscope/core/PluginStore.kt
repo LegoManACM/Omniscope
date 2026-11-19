@@ -116,10 +116,22 @@ class PluginStore(private val context: Context, private val http: Http) {
         for (repo in sources.value) {
             try {
                 // The commit sha pins everything read from this repo for this listing.
-                val sha = http.text("https://api.github.com/repos/$repo/commits/HEAD", if (force) 0 else 10 * 60_000L,
-                    mapOf("Accept" to "application/vnd.github.sha")).trim()
-                if (!Regex("^[0-9a-f]{40}$").matches(sha)) throw Exception("Couldn't read the latest commit")
-                val index = JSONObject(http.text("https://raw.githubusercontent.com/$repo/$sha/plugins/index.json", 30L * 24 * 3_600_000L))
+                val sha = try {
+                    http.text("https://api.github.com/repos/$repo/commits/HEAD", if (force) 0 else 10 * 60_000L,
+                        mapOf("Accept" to "application/vnd.github.sha")).trim()
+                } catch (e: HttpException) {
+                    throw Exception(when (e.code) {
+                        404, 422 -> "no such public repo on GitHub"
+                        403, 429 -> "GitHub's rate limit (60 checks an hour without an account); try again later"
+                        else -> "GitHub said ${e.code}"
+                    })
+                }
+                if (!Regex("^[0-9a-f]{40}$").matches(sha)) throw Exception("couldn't read the latest commit")
+                val index = try {
+                    JSONObject(http.text("https://raw.githubusercontent.com/$repo/$sha/plugins/index.json", 30L * 24 * 3_600_000L))
+                } catch (e: HttpException) {
+                    if (e.code == 404) throw Exception("this repo has no plugins/index.json on its main branch") else throw e
+                }
                 val list = index.optJSONArray("plugins") ?: JSONArray()
                 for (i in 0 until list.length()) {
                     val e = list.optJSONObject(i) ?: continue
