@@ -48,7 +48,8 @@ class ManifestTest {
                 val first = items.firstOrNull()
                 report.append("OK   ${m.id}: ${items.size} items. e.g. ${first?.title} | ${first?.subtitle} | ${first?.lat},${first?.lon} " +
                     "| alt=${first?.altM} | img=${first?.image != null} | fields=${first?.fields?.size} | links=${first?.links?.map { it.first }}\n")
-                if (items.isEmpty() && m.id !in setOf("quakes")) { failures++; report.append("     ^ no items\n") }
+                // Empty is often legitimate (no alerts today, no coverage here, a UK-only API), so it's a warning.
+                if (items.isEmpty()) report.append("     ^ no items here (check coverage)\n")
             } catch (e: Exception) {
                 // The public Overpass servers are often overloaded; that's their outage, not a manifest bug.
                 val overpassFlake = m.request?.has("overpass") == true && (e.message ?: "").contains(Regex("timed out|50[234]|429"))
