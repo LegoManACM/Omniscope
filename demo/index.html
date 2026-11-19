@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Free API Explorer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root {
+    --bg: #f4f2ee; --card: #ffffff; --ink: #1d1d1b; --muted: #6b6a66; --line: #e3e0d9;
+    --accent: #2f6f5e; --warn: #b5562d; --chip: #eef3f1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151614; --card: #1f201e; --ink: #ecebe6; --muted: #9a9993; --line: #33342f; --accent: #6cc3a6; --warn: #e48a5f; --chip: #263330; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  header { padding: 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; border-bottom: 1px solid var(--line); }
+  h1 { font-size: 18px; margin: 0 12px 0 0; }
+  button { font: inherit; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  #coords { color: var(--muted); font-variant-numeric: tabular-nums; }
+  #map { height: 260px; border-bottom: 1px solid var(--line); }
+  main { padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; min-height: 120px; overflow: hidden; }
+  .card h2 { font-size: 15px; margin: 0; }
+  .src { font-size: 12px; color: var(--muted); margin: 2px 0 10px; }
+  .src a { color: inherit; }
+  .status { font-size: 12px; color: var(--muted); }
+  .err { color: var(--warn); font-size: 13px; }
+  .big { font-size: 28px; font-weight: 600; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  td { padding: 3px 6px 3px 0; vertical-align: top; border-bottom: 1px solid var(--line); }
+  td:first-child { color: var(--muted); white-space: nowrap; }
+  ul { margin: 0; padding-left: 18px; }
+  li { margin: 2px 0; }
+  a { color: var(--accent); }
+  .muted { color: var(--muted); }
+  .thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .thumbs img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 4px; display: block; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip { background: var(--chip); border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+  .species { display: grid; grid-template-columns: 40px 1fr; gap: 6px 8px; align-items: center; }
+  .species img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Free API Explorer</h1>
+  <button class="primary" id="locate">Use my location</button>
+  <span class="muted">or click the map ·</span>
+  <button data-ll="44.46,-110.83">Yellowstone</button>
+  <button data-ll="35.68,139.76">Tokyo</button>
+  <button data-ll="51.47,-0.45">Heathrow</button>
+  <button data-ll="64.15,-21.94">Reykjavík</button>
+  <button data-ll="40.758,-73.985">Times Sq</button>
+  <span id="coords"></span>
+</header>
+<div id="map"></div>
+<main id="cards"></main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ---------- helpers ----------
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeUrl = u => /^https?:\/\//.test(u || '') ? esc(u) : '#';
+async function api(url) {
+  const r = await fetch('/api?u=' + encodeURIComponent(url));
+  const t = await r.text();
+  if (!r.ok) throw new Error(`${r.status}: ${t.replace(/<[^>]+>/g, ' ').slice(0, 160)}`);
+  if (!t.trim()) return null;
+  try { return JSON.parse(t); } catch { return t; }
+}
+function km(a1, o1, a2, o2) {
+  const R = 6371, d = Math.PI / 180, x = (a2 - a1) * d, y = (o2 - o1) * d;
+  const h = Math.sin(x/2)**2 + Math.cos(a1*d) * Math.cos(a2*d) * Math.sin(y/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const rows = obj => '<table>' + Object.entries(obj).filter(([,v]) => v !== undefined && v !== null && v !== '')
+  .map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('') + '</table>';
+const time = (iso, tz) => { try { return new Date(iso).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit', timeZone: tz}); } catch { return new Date(iso).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}); } };
+const WMO = {0:'Clear',1:'Mostly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'Rime fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',61:'Light rain',63:'Rain',65:'Heavy rain',66:'Freezing rain',67:'Freezing rain',71:'Light snow',73:'Snow',75:'Heavy snow',77:'Snow grains',80:'Showers',81:'Showers',82:'Violent showers',85:'Snow showers',86:'Snow showers',95:'Thunderstorm',96:'Thunderstorm + hail',99:'Thunderstorm + hail'};
+function moonPhase(date = new Date()) {
+  const syn = 29.530588853, ref = Date.UTC(2000, 0, 6, 18, 14);
+  const age = (((date - ref) / 864e5) % syn + syn) % syn;
+  const names = ['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'];
+  const illum = Math.round((1 - Math.cos(2 * Math.PI * age / syn)) / 2 * 100);
+  return { name: names[Math.round(age / syn * 8) % 8], age: age.toFixed(1), illum };
+}
+
+// ---------- cards ----------
+// Each card: id, title, source (name + url), run(ctx) -> html string
+const CARDS = [
+  { id: 'place', title: '📍 Where you are', src: ['Nominatim (OpenStreetMap)', 'https://nominatim.org'], run: async c => {
+    const p = await c.place;
+    const a = p.address || {};
+    return `<div>${esc(p.display_name)}</div><br>` + rows({
+      'Type': esc(`${p.category || ''} / ${p.type || ''}`), 'Road': esc(a.road), 'Neighbourhood': esc(a.neighbourhood || a.suburb),
+      'City': esc(a.city || a.town || a.village || a.hamlet), 'County': esc(a.county), 'State': esc(a.state),
+      'Postcode': esc(a.postcode), 'Country': esc(a.country), 'OSM': `<a target="_blank" href="https://www.openstreetmap.org/${esc(p.osm_type)}/${esc(p.osm_id)}">${esc(p.osm_type)} ${esc(p.osm_id)}</a>`
+    });
+  }},
+  { id: 'weather', title: '🌤️ Weather', src: ['Open-Meteo', 'https://open-meteo.com'], run: async c => {
+    const d = await c.weather;
+    const cu = d.current, dl = d.daily;
+    const days = dl.time.map((t, i) => `<tr><td>${new Date(t + 'T12:00').toLocaleDateString([], {weekday: 'short'})}</td><td>${esc(WMO[dl.weather_code[i]] ?? dl.weather_code[i])}</td><td>${Math.round(dl.temperature_2m_min[i])}–${Math.round(dl.temperature_2m_max[i])}°</td><td>${dl.precipitation_probability_max[i] ?? '–'}% 💧</td><td>UV ${dl.uv_index_max[i] ?? '–'}</td></tr>`).join('');
+    return `<div class="big">${Math.round(cu.temperature_2m)}°C</div><div>${esc(WMO[cu.weather_code] ?? '')} · feels ${Math.round(cu.apparent_temperature)}° · ${cu.relative_humidity_2m}% RH · wind ${Math.round(cu.wind_speed_10m)} km/h · clouds ${cu.cloud_cover}%</div><div class="muted">Local timezone: ${esc(d.timezone)}</div><br><table>${days}</table>`;
+  }},
+  { id: 'air', title: '🫁 Air quality & pollen', src: ['Open-Meteo Air Quality (CAMS)', 'https://open-meteo.com/en/docs/air-quality-api'], run: async ({lat, lon}) => {
+    const d = await api(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,european_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,uv_index,dust,alder_pollen,birch_pollen,grass_pollen,ragweed_pollen`);
+    const c = d.current, u = d.current_units;
+    const f = k => c[k] == null ? undefined : `${c[k]} ${esc(u[k] || '')}`;
+    return rows({ 'US AQI': f('us_aqi'), 'EU AQI': f('european_aqi'), 'PM2.5': f('pm2_5'), 'PM10': f('pm10'), 'Ozone': f('ozone'), 'NO₂': f('nitrogen_dioxide'), 'Dust': f('dust'), 'UV index': f('uv_index'),
+      'Grass pollen': f('grass_pollen'), 'Birch pollen': f('birch_pollen'), 'Alder pollen': f('alder_pollen'), 'Ragweed pollen': f('ragweed_pollen') }) +
+      '<div class="muted" style="margin-top:6px">Pollen is Europe-only (blank elsewhere).</div>';
+  }},
+  { id: 'sun', title: '🌅 Sun & moon', src: ['Sunrise-Sunset.org + local moon math', 'https://sunrise-sunset.org/api'], run: async c => {
+    const [r, w] = await Promise.all([api(`https://api.sunrise-sunset.org/json?lat=${c.lat}&lng=${c.lon}&formatted=0`), c.weather.catch(() => ({}))]);
+    const d = r.results, tz = w.timezone, t = iso => esc(time(iso, tz));
+    const m = moonPhase();
+    const len = d.day_length; const h = Math.floor(len / 3600), mi = Math.round(len % 3600 / 60);
+    return rows({ 'Astronomical dawn': t(d.astronomical_twilight_begin), 'Civil dawn': t(d.civil_twilight_begin), 'Sunrise': t(d.sunrise), 'Solar noon': t(d.solar_noon),
+      'Sunset': t(d.sunset), 'Civil dusk': t(d.civil_twilight_end), 'Astronomical dusk': t(d.astronomical_twilight_end), 'Day length': `${h}h ${mi}m`,
+      'Moon': `${m.name} · ${m.illum}% lit · ${m.age} days old` }) + `<div class="muted" style="margin-top:6px">Local time at the pin (${esc(tz || 'browser timezone')}).</div>`;
+  }},
+  { id: 'ground', title: '🪨 Under your feet', src: ['Open-Meteo Elevation + Macrostrat', 'https://macrostrat.org/api'], run: async ({lat, lon}) => {
+    const [el, geo] = await Promise.allSettled([
+      api(`https://api.open-meteo.com/v1/elevation?latitude=${lat}&longitude=${lon}`),
+      api(`https://macrostrat.org/api/v2/geologic_units/map?lat=${lat}&lng=${lon}`)]);
+    let h = el.status === 'fulfilled' ? `<div class="big">${Math.round(el.value.elevation[0])} m</div><div class="muted">elevation (Copernicus DEM 90 m)</div><br>` : `<div class="err">Elevation failed</div>`;
+    const u = geo.status === 'fulfilled' ? geo.value?.success?.data?.[0] : null;
+    if (u) {
+      const age = u.b_int_age != null ? `${u.b_int_name}${u.t_int_name !== u.b_int_name ? '–' + u.t_int_name : ''} (${u.t_int_age}–${u.b_int_age} Ma)` : u.b_int_name;
+      h += rows({ 'Unit': esc(u.name), 'Rock': esc(u.lith), 'Age': esc(age) }) + (u.descrip ? `<p class="muted">${esc(u.descrip.slice(0, 400))}${u.descrip.length > 400 ? '…' : ''}</p>` : '');
+    } else h += '<div class="muted">No geologic map unit here (ocean, or a gap in coverage).</div>';
+    return h;
+  }},
+  { id: 'wiki', title: '📚 Wikipedia nearby', src: ['Wikipedia GeoSearch', 'https://www.mediawiki.org/wiki/API:Geosearch'], run: async ({lat, lon}) => {
+    const d = await api(`https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord=${lat}%7C${lon}&gsradius=10000&gslimit=15&format=json`);
+    const g = d.query?.geosearch || [];
+    if (!g.length) return '<div class="muted">No articles within 10 km.</div>';
+    return '<ul>' + g.map(a => `<li><a target="_blank" href="https://en.wikipedia.org/?curid=${a.pageid}">${esc(a.title)}</a> <span class="muted">${a.dist < 1000 ? Math.round(a.dist) + ' m' : (a.dist / 1000).toFixed(1) + ' km'}</span></li>`).join('') + '</ul>';
+  }},
+  { id: 'photos', title: '📷 Photos taken near here', src: ['Wikimedia Commons geosearch', 'https://commons.wikimedia.org'], run: async ({lat, lon}) => {
+    const d = await api(`https://commons.wikimedia.org/w/api.php?action=query&generator=geosearch&ggscoord=${lat}%7C${lon}&ggsradius=5000&ggsnamespace=6&ggslimit=16&prop=imageinfo&iiprop=url&iiurlwidth=200&format=json`);
+    const p = Object.values(d.query?.pages || {}).filter(x => x.imageinfo?.[0]?.thumburl);
+    if (!p.length) return '<div class="muted">No geotagged photos within 5 km.</div>';
+    return '<div class="thumbs">' + p.map(x => `<a target="_blank" href="${safeUrl(x.imageinfo[0].descriptionurl)}" title="${esc(x.title)}"><img loading="lazy" src="${safeUrl(x.imageinfo[0].thumburl)}" alt=""></a>`).join('') + '</div>';
+  }},
+  { id: 'pois', title: '🏪 What’s within 400 m', src: ['Overpass API (OpenStreetMap)', 'https://overpass-api.de'], run: async ({lat, lon}) => {
+    const q = `[out:json][timeout:20];(nwr(around:400,${lat},${lon})[amenity][name];nwr(around:400,${lat},${lon})[tourism][name];nwr(around:400,${lat},${lon})[historic];nwr(around:400,${lat},${lon})[shop][name];nwr(around:400,${lat},${lon})[leisure][name];);out tags center 80;`;
+    let d, lastErr;
+    for (const host of ['overpass-api.de', 'overpass.private.coffee']) {  // main instance is often overloaded
+      try { d = await api(`https://${host}/api/interpreter?data=` + encodeURIComponent(q)); break; } catch (e) { lastErr = e; }
+    }
+    if (!d) throw new Error('Both public Overpass servers are overloaded right now (try again later). ' + lastErr.message.slice(0, 60));
+    const el = d.elements || [];
+    if (!el.length) return '<div class="muted">Nothing mapped within 400 m.</div>';
+    const counts = {};
+    el.forEach(e => { const t = e.tags; const k = t.historic ? 'historic: ' + t.historic : t.tourism ? t.tourism : t.amenity || t.shop || t.leisure; counts[k] = (counts[k] || 0) + 1; });
+    const chips = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 18).map(([k, n]) => `<span class="chip">${esc(k)} ${n}</span>`).join('');
+    const named = el.filter(e => e.tags.historic || e.tags.tourism).slice(0, 10).map(e => `<li>${esc(e.tags.name || '(unnamed)')} <span class="muted">${esc(e.tags.historic || e.tags.tourism)}</span></li>`).join('');
+    return `<div class="chips">${chips}</div>${named ? '<br><b>Historic & tourism</b><ul>' + named + '</ul>' : ''}`;
+  }},
+  { id: 'webcams', title: '🎥 Webcams nearby (50 km)', key: true, src: ['Windy Webcams API v3', 'https://api.windy.com/webcams/docs'], run: async ({lat, lon}) => {
+    let d;
+    try { d = await api(`https://api.windy.com/webcams/api/v3/webcams?nearby=${lat},${lon},50&include=images,location,urls&limit=12`); }
+    catch (e) {
+      if (/no_key/.test(e.message)) return `<div>This one needs a free key.</div><ol style="padding-left:18px">
+        <li>Sign up at <a target="_blank" href="https://api.windy.com/keys">api.windy.com/keys</a> and create a <b>Webcams API</b> key (free tier).</li>
+        <li>Paste it into <code>demo/windy_key.txt</code> (or set <code>WINDY_WEBCAMS_KEY</code>).</li>
+        <li>Click a location again, no restart needed.</li></ol><div class="muted">The key stays in the local proxy and never reaches the browser.</div>`;
+      throw e;
+    }
+    const cams = (d.webcams || []).map(w => ({...w, dk: w.location ? km(lat, lon, w.location.latitude, w.location.longitude) : null})).sort((a, b) => (a.dk ?? 1e9) - (b.dk ?? 1e9));
+    if (!cams.length) return '<div class="muted">No webcams within 50 km.</div>';
+    return `<div class="muted">${d.total ?? cams.length} cams in range</div><br><div class="thumbs" style="grid-template-columns:repeat(2,1fr)">` + cams.map(w => {
+      const img = w.images?.current?.preview || w.images?.current?.thumbnail;
+      const link = w.urls?.detail || `https://www.windy.com/webcams/${w.webcamId}`;
+      return `<a target="_blank" href="${safeUrl(link)}" title="${esc(w.title)}" style="text-decoration:none;color:inherit">${img ? `<img loading="lazy" src="${safeUrl(img)}" alt="" style="aspect-ratio:16/9">` : ''}<div style="font-size:12px">${esc(w.title)}${w.dk != null ? ` <span class="muted">${w.dk.toFixed(0)} km</span>` : ''}</div></a>`;
+    }).join('') + '</div><div class="muted" style="margin-top:6px">Free-tier image links expire after ~10 min. Re-click to refresh.</div>';
+  }},
+  { id: 'species', title: '🦋 Life observed nearby', src: ['iNaturalist (research-grade, 10 km)', 'https://api.inaturalist.org/v1/docs/'], run: async ({lat, lon}) => {
+    const d = await api(`https://api.inaturalist.org/v1/observations/species_counts?lat=${lat}&lng=${lon}&radius=10&quality_grade=research&per_page=12`);
+    if (!d.results?.length) return '<div class="muted">No research-grade observations within 10 km.</div>';
+    return `<div class="muted">${d.total_results} species recorded. Most observed:</div><br><div class="species">` + d.results.map(r => `<img loading="lazy" src="${safeUrl(r.taxon.default_photo?.square_url)}" alt=""><div><b>${esc(r.taxon.preferred_common_name || r.taxon.name)}</b> <i class="muted">${esc(r.taxon.name)}</i><br><span class="muted">${esc(r.taxon.iconic_taxon_name || '')} · ${r.count} obs</span></div>`).join('') + '</div>';
+  }},
+  { id: 'planes', title: '✈️ Aircraft overhead (~45 km)', src: ['adsb.lol → airplanes.live fallback', 'https://api.adsb.lol/docs'], run: async ({lat, lon}) => {
+    let d, used = 'adsb.lol';
+    try { d = await api(`https://api.adsb.lol/v2/point/${lat}/${lon}/25`); }
+    catch { used = 'airplanes.live'; d = await api(`https://api.airplanes.live/v2/point/${lat}/${lon}/25`); }
+    const ac = (d.ac || []).filter(a => a.lat != null).map(a => ({...a, dk: km(lat, lon, a.lat, a.lon)})).sort((a, b) => a.dk - b.dk);
+    if (!ac.length) return `<div class="muted">No aircraft broadcasting within 25 nm right now (via ${used}).</div>`;
+    return `<div class="muted">${ac.length} aircraft via ${used}</div><table>` + ac.slice(0, 12).map(a => `<tr><td>${esc((a.flight || a.r || a.hex).trim())}</td><td>${esc(a.t || '?')}</td><td>${a.alt_baro === 'ground' ? 'on ground' : (a.alt_baro != null ? Math.round(a.alt_baro * 0.3048).toLocaleString() + ' m' : '')}</td><td>${a.dk.toFixed(1)} km</td></tr>`).join('') + '</table>';
+  }},
+  { id: 'quakes', title: '🌋 Earthquakes (30 days, 1000 km)', src: ['USGS FDSN', 'https://earthquake.usgs.gov/fdsnws/event/1/'], run: async ({lat, lon}) => {
+    const start = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
+    const d = await api(`https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=${lat}&longitude=${lon}&maxradiuskm=1000&starttime=${start}&minmagnitude=2.5&orderby=magnitude&limit=10`);
+    if (!d.features?.length) return '<div class="muted">No M2.5+ quakes within 1000 km in the last 30 days.</div>';
+    return '<table>' + d.features.map(f => { const [qlon, qlat] = f.geometry.coordinates; return `<tr><td><b>M${f.properties.mag.toFixed(1)}</b></td><td><a target="_blank" href="${safeUrl(f.properties.url)}">${esc(f.properties.place)}</a></td><td>${Math.round(km(lat, lon, qlat, qlon))} km</td><td class="muted">${new Date(f.properties.time).toLocaleDateString()}</td></tr>`; }).join('') + '</table>';
+  }},
+  { id: 'space', title: '🛰️ ISS & space weather', src: ['wheretheiss.at + NOAA SWPC', 'https://services.swpc.noaa.gov'], run: async ({lat, lon}) => {
+    const [iss, kp] = await Promise.allSettled([api('https://api.wheretheiss.at/v1/satellites/25544'), api('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json')]);
+    let h = '';
+    if (iss.status === 'fulfilled') { const s = iss.value; h += rows({ 'ISS position': `${s.latitude.toFixed(2)}, ${s.longitude.toFixed(2)}`, 'Distance from you': `${Math.round(km(lat, lon, s.latitude, s.longitude)).toLocaleString()} km (ground)`, 'Altitude / speed': `${Math.round(s.altitude)} km · ${Math.round(s.velocity).toLocaleString()} km/h`, 'In sunlight?': esc(s.visibility) }); }
+    if (kp.status === 'fulfilled') {
+      const last = kp.value.at(-1); const k = Array.isArray(last) ? +last[1] : +(last.Kp ?? last.kp_index);
+      const reach = Math.round(66.5 - 2.5 * k);  // rough rule of thumb, geographic not geomagnetic
+      h += '<br>' + rows({ 'Planetary Kp': `<b>${k.toFixed(1)}</b> / 9 ${k >= 5 ? '⚡ storm' : ''}`, 'Aurora (rough)': `overhead near ≥${reach}° lat · you’re at ${Math.abs(lat).toFixed(0)}°` });
+    }
+    return h || '<div class="err">Both sources failed.</div>';
+  }},
+  { id: 'radio', title: '📻 Radio stations near here', src: ['Radio Browser', 'https://www.radio-browser.info'], run: async ({lat, lon}) => {
+    const d = await api(`https://de1.api.radio-browser.info/json/stations/search?geo_lat=${lat}&geo_long=${lon}&geo_distance=100000&has_geo_info=true&hidebroken=true&order=clickcount&reverse=true&limit=40`);
+    const st = d.filter(s => s.geo_lat != null).map(s => ({...s, dk: km(lat, lon, s.geo_lat, s.geo_long)})).filter(s => s.dk <= 100).slice(0, 10);
+    if (!st.length) return '<div class="muted">No geotagged stations within 100 km.</div>';
+    return '<ul>' + st.map(s => `<li><a target="_blank" href="${safeUrl(s.url_resolved || s.url)}">${esc(s.name.trim())}</a> <span class="muted">${esc((s.tags || '').split(',').slice(0, 2).join(', '))} · ${s.dk.toFixed(0)} km</span></li>`).join('') + '</ul><div class="muted" style="margin-top:6px">Links open the live stream.</div>';
+  }},
+  { id: 'country', title: '🏳️ Country & holidays', src: ['Nager.Date', 'https://date.nager.at'], run: async c => {
+    const cc = (await c.place).address?.country_code?.toUpperCase();
+    if (!cc) return '<div class="muted">No country (open water?).</div>';
+    const [info, hol] = await Promise.allSettled([api(`https://date.nager.at/api/v3/CountryInfo/${cc}`), api(`https://date.nager.at/api/v3/NextPublicHolidays/${cc}`)]);
+    let h = '';
+    if (info.status === 'fulfilled' && info.value) h += rows({ 'Country': esc(info.value.officialName || info.value.commonName), 'Region': esc(info.value.region), 'Borders': esc((info.value.borders || []).map(b => b.commonName).join(', ') || 'none') });
+    const hl = hol.status === 'fulfilled' && Array.isArray(hol.value) ? hol.value : [];
+    h += hl.length ? '<br><b>Next public holidays</b><ul>' + hl.slice(0, 6).map(x => `<li>${esc(x.date)} — ${esc(x.name)}${x.localName !== x.name ? ` <span class="muted">(${esc(x.localName)})</span>` : ''}</li>`).join('') + '</ul>' : `<div class="muted">No holiday data for ${esc(cc)}.</div>`;
+    return h;
+  }},
+  { id: 'alerts', title: '⚠️ Weather alerts (US)', src: ['NWS api.weather.gov', 'https://www.weather.gov/documentation/services-web-api'], run: async c => {
+    if ((await c.place).address?.country_code !== 'us') return '<div class="muted">NWS only covers the US. (EU equivalent: Meteoalarm feeds.)</div>';
+    const d = await api(`https://api.weather.gov/alerts/active?point=${c.lat},${c.lon}`);
+    if (!d.features?.length) return '<div>✅ No active alerts for this point.</div>';
+    return '<ul>' + d.features.map(f => `<li><b>${esc(f.properties.event)}</b> <span class="muted">${esc(f.properties.severity)}</span><br>${esc(f.properties.headline)}</li>`).join('') + '</ul>';
+  }},
+];
+
+// ---------- wiring ----------
+const cardsEl = document.getElementById('cards');
+cardsEl.innerHTML = CARDS.map(c => `<section class="card" id="c-${c.id}"><h2>${c.title}</h2><div class="src">via <a target="_blank" href="${c.src[1]}">${esc(c.src[0])}</a> · ${c.key ? 'free key' : 'no key'}</div><div class="body"></div></section>`).join('');
+
+const map = L.map('map', { worldCopyJump: true }).setView([30, 0], 2);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+let marker, runId = 0;
+
+function load(lat, lon) {
+  lat = +(+lat).toFixed(4); lon = +(((+lon + 540) % 360) - 180).toFixed(4);
+  const id = ++runId;
+  document.getElementById('coords').textContent = `${lat}, ${lon}`;
+  if (marker) marker.setLatLng([lat, lon]); else marker = L.marker([lat, lon]).addTo(map);
+  map.setView([lat, lon], Math.max(map.getZoom(), 12));
+  const place = api(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1&accept-language=en`).then(p => { if (p?.error) throw new Error(p.error); return p; });
+  place.catch(() => {});
+  const weather = api(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&timezone=auto&forecast_days=5`);
+  weather.catch(() => {});
+  const ctx = { lat, lon, place, weather };
+  for (const c of CARDS) {
+    const body = document.querySelector(`#c-${c.id} .body`);
+    body.innerHTML = '<span class="status">Loading…</span>';
+    const t0 = performance.now();
+    c.run(ctx).then(html => { if (id === runId) body.innerHTML = html + `<div class="status" style="margin-top:8px">${Math.round(performance.now() - t0)} ms</div>`; })
+      .catch(e => { if (id === runId) body.innerHTML = `<div class="err">Failed: ${esc(e.message)}</div>`; });
+  }
+}
+
+map.on('click', e => load(e.latlng.lat, e.latlng.lng));
+document.querySelectorAll('[data-ll]').forEach(b => b.onclick = () => load(...b.dataset.ll.split(',')));
+function locate() {
+  if (!navigator.geolocation) return load(44.46, -110.83);
+  navigator.geolocation.getCurrentPosition(p => load(p.coords.latitude, p.coords.longitude), () => load(44.46, -110.83), { timeout: 8000 });
+}
+document.getElementById('locate').onclick = locate;
+locate();
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+demo/windy_key.txt
+android/local.properties
+android/.gradle/
+android/build/
+android/app/build/
+android/.idea/
+*.iml
+__pycache__/
+android/app/src/main/assets/plugins/
+.claude/settings.local.json

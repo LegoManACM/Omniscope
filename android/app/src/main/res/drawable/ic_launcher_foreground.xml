@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- FreeApiExplorer launcher icon: the AR reticle on a target, a north tick, category dots. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:pathData="M22,58 Q54,52 86,58" android:strokeColor="#5980DEEA" android:strokeWidth="1.6" android:strokeLineCap="round"/>
+    <path android:pathData="M65.45,36 a5.550000000000001,5.550000000000001 0 1,0 11.100000000000001,0 a5.550000000000001,5.550000000000001 0 1,0 -11.100000000000001,0 Z" android:fillColor="#4D81C784"/>
+    <path android:pathData="M68,36 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z" android:fillColor="#FF81C784"/>
+    <path android:pathData="M30.689999999999998,40 a4.8100000000000005,4.8100000000000005 0 1,0 9.620000000000001,0 a4.8100000000000005,4.8100000000000005 0 1,0 -9.620000000000001,0 Z" android:fillColor="#4DB39DDB"/>
+    <path android:pathData="M32.9,40 a2.6,2.6 0 1,0 5.2,0 a2.6,2.6 0 1,0 -5.2,0 Z" android:fillColor="#FFB39DDB"/>
+    <path android:pathData="M69.93,68 a4.07,4.07 0 1,0 8.14,0 a4.07,4.07 0 1,0 -8.14,0 Z" android:fillColor="#4DF48FB1"/>
+    <path android:pathData="M71.8,68 a2.2,2.2 0 1,0 4.4,0 a2.2,2.2 0 1,0 -4.4,0 Z" android:fillColor="#FFF48FB1"/>
+    <path android:pathData="M41,54 a13,13 0 1,0 26,0 a13,13 0 1,0 -26,0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="54" android:centerY="54" android:gradientRadius="13" android:startColor="#BFFFD54F" android:endColor="#00FFD54F"/>
+        </aapt:attr>
+    </path>
+    <path android:pathData="M48.8,54 a5.2,5.2 0 1,0 10.4,0 a5.2,5.2 0 1,0 -10.4,0 Z" android:fillColor="#FFFFD54F"/>
+    <path android:pathData="M52.2,54 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0 Z" android:fillColor="#993A2E00"/>
+    <path android:pathData="M33.33,46.48 A22,22 0 0,1 74.67,46.48 M74.67,61.52 A22,22 0 0,1 33.33,61.52 M23,54 L42,54 M66,54 L85,54" android:strokeColor="#FFFFFFFF" android:strokeWidth="3.6" android:strokeLineCap="round"/>
+    <path android:pathData="M54,23.5 L57.6,29.5 L50.4,29.5 Z" android:fillColor="#FFFF8A80"/>
+</vector>

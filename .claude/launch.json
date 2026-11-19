@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "free-api-explorer",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["C:/Users/afrik/Github/FreeApiExplorer/demo/server.py"],
+      "port": 8765
+    }
+  ]
+}
