@@ -110,8 +110,9 @@ private fun Root(app: App) {
 
     // AR and Nav are used hands-up or on a mount: keep the screen on while they're showing.
     val view = LocalView.current
-    DisposableEffect(tab) {
-        view.keepScreenOn = tab == Tab.AR || tab == Tab.NAV
+    val keepOn by app.keepScreenOn.collectAsState()
+    DisposableEffect(tab, keepOn) {
+        view.keepScreenOn = keepOn && (tab == Tab.AR || tab == Tab.NAV)
         onDispose { view.keepScreenOn = false }
     }
 

@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "id": "nature",
+  "version": 1,
+  "name": "Wildlife sightings",
+  "description": "Recent wildlife and plant sightings.",
+  "author": "Omniscope",
+  "source": "iNaturalist",
+  "category": "nature",
+  "icon": "butterfly",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["nature"],
+  "radius": {
+    "default": 3000,
+    "min": 10,
+    "max": 50000
+  },
+  "hosts": ["api.inaturalist.org"],
+  "request": {
+    "url": "https://api.inaturalist.org/v1/observations?lat={lat}&lng={lon}&radius={radius_km:3}&per_page=60&order=desc&order_by=observed_on&photos=true&geo=true"
+  },
+  "items": "$.results[*]",
+  "item": {
+    "id": "$.id",
+    "title": "$.taxon.preferred_common_name | cap || $.taxon.name || $.species_guess | cap",
+    "subtitle": "{$.taxon.name} · {$.observed_on}",
+    "lat": "$.geojson.coordinates[1]",
+    "lon": "$.geojson.coordinates[0]",
+    "image": "$.photos[0].url | replace:square=>medium",
+    "gallery": "$.photos[*].url | replace:square=>medium",
+    "fields": [
+      ["Scientific name", "$.taxon.name"],
+      ["Group", "$.taxon.iconic_taxon_name"],
+      ["Observed", "$.observed_on"],
+      ["Quality", "$.quality_grade | replace:'_=> '"]
+    ],
+    "links": [
+      ["iNaturalist observation", "$.uri"],
+      ["Species page", "https://www.inaturalist.org/taxa/{$.taxon.id}"]
+    ]
+  }
+}

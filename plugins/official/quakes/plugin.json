@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "quakes",
+  "version": 1,
+  "name": "Earthquakes",
+  "description": "Magnitude 2.5 and up in the last 14 days.",
+  "author": "Omniscope",
+  "source": "USGS",
+  "category": "hazards",
+  "icon": "warning",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["hazard", "terrain"],
+  "radius": {
+    "default": 1000000,
+    "min": 10000,
+    "max": 5000000
+  },
+  "hosts": ["earthquake.usgs.gov"],
+  "request": {
+    "url": "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude={lat}&longitude={lon}&maxradiuskm={radius_km}&starttime={date:-14}&minmagnitude=2.5&orderby=magnitude&limit=40"
+  },
+  "items": "$.features[*]",
+  "item": {
+    "id": "$.id",
+    "title": "Magnitude {$.properties.mag | round1}",
+    "subtitle": "{$.properties.place} · {$.properties.time | date}",
+    "lat": "$.geometry.coordinates[1]",
+    "lon": "$.geometry.coordinates[0]",
+    "fields": [
+      ["Where", "$.properties.place"],
+      ["Depth", "$.geometry.coordinates[2] | round | suffix: km"],
+      ["Date", "$.properties.time | date"],
+      ["Felt reports", "$.properties.felt"]
+    ],
+    "links": [
+      ["USGS event page", "$.properties.url"]
+    ]
+  }
+}

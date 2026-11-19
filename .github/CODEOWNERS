@@ -1,0 +1,5 @@
+# Official plugins, the app and CI need the maintainer's review. Community plugins can be reviewed by anyone with write access.
+/plugins/official/ @LegoManACM
+/android/ @LegoManACM
+/.github/ @LegoManACM
+/tools/ @LegoManACM

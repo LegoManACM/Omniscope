@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "scan_mlkit_labels",
+  "version": 1,
+  "name": "Objects (ML Kit)",
+  "description": "Names what's in view (400+ everyday objects and scenes).",
+  "author": "Omniscope",
+  "source": "Google ML Kit, on the phone",
+  "category": "scan",
+  "icon": "tag",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["scan"],
+  "native": "scan_mlkit_labels"
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "scan_zxing_barcodes",
+  "version": 1,
+  "name": "Barcodes (ZXing)",
+  "description": "Open-source QR and barcode reader. Finds one code per frame.",
+  "author": "Omniscope",
+  "source": "ZXing, open source (Apache 2.0)",
+  "category": "scan",
+  "icon": "barcode",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["scan"],
+  "native": "scan_zxing_barcodes"
+}

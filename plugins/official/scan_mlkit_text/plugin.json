@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "scan_mlkit_text",
+  "version": 1,
+  "name": "Text (ML Kit)",
+  "description": "Reads Latin-script text: signs, labels, plaques.",
+  "author": "Omniscope",
+  "source": "Google ML Kit, on the phone",
+  "category": "scan",
+  "icon": "text-t",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["scan"],
+  "native": "scan_mlkit_text"
+}

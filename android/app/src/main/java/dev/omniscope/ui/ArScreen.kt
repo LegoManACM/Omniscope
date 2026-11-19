@@ -331,6 +331,7 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
     val detections by app.scan.detections.collectAsState()
     val frameSize by app.scan.frameSize.collectAsState()
     val products by app.scan.products.collectAsState()
+    val outlines by app.buildingOutlines.collectAsState()
     val fov = remember { backCameraFov(context) }
 
     val declination = remember(fix?.let { Geo.round4(it.lat * 10) }, fix?.let { Geo.round4(it.lon * 10) }) {
@@ -410,7 +411,7 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
             // Buildings: faint outlines when close, the targeted one filled.
             for (wire in wires) {
                 val isTarget = wire.item.id == target?.id
-                if (!isTarget && wire.distM > 150f) continue
+                if (!isTarget && (!outlines || wire.distM > 150f)) continue
                 val count = scratch.project(wire, proj)
                 if (count == 0) continue
                 if (isTarget) {

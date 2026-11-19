@@ -1,0 +1,34 @@
+{
+  "format": 1,
+  "id": "photos",
+  "version": 1,
+  "name": "Photos taken here",
+  "description": "Geotagged photos taken near you.",
+  "author": "Omniscope",
+  "source": "Wikimedia Commons",
+  "category": "media",
+  "icon": "image",
+  "cost": "free",
+  "freshness": "static",
+  "tags": ["culture", "history"],
+  "radius": {
+    "default": 2000,
+    "min": 10,
+    "max": 10000
+  },
+  "hosts": ["commons.wikimedia.org"],
+  "request": {
+    "url": "https://commons.wikimedia.org/w/api.php?action=query&generator=geosearch&ggscoord={lat}%7C{lon}&ggsradius={radius_m}&ggsnamespace=6&ggslimit=40&prop=imageinfo%7Ccoordinates&iiprop=url&iiurlwidth=800&format=json"
+  },
+  "items": "$.query.pages.*",
+  "item": {
+    "id": "$.pageid",
+    "title": "$.title | removeprefix:File: | noext",
+    "lat": "$.coordinates[0].lat",
+    "lon": "$.coordinates[0].lon",
+    "image": "$.imageinfo[0].thumburl",
+    "links": [
+      ["Wikimedia Commons", "$.imageinfo[0].descriptionurl"]
+    ]
+  }
+}

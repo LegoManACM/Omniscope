@@ -7,7 +7,7 @@ import dev.omniscope.core.Geo
 import dev.omniscope.core.Http
 import dev.omniscope.core.Item
 import dev.omniscope.core.Registry
-import dev.omniscope.plugins.allPlugins
+import dev.omniscope.core.PluginStore
 import dev.omniscope.sensors.LocationSource
 import dev.omniscope.sensors.OrientationSource
 import kotlinx.coroutines.MainScope
@@ -23,6 +23,7 @@ class App : Application() {
     lateinit var location: LocationSource
     lateinit var orientation: OrientationSource
     lateinit var registry: Registry
+    lateinit var store: PluginStore
     lateinit var ctx: StateFlow<Ctx?>
 
     /** The item shown full screen (the item page), from any view. */
@@ -50,6 +51,15 @@ class App : Application() {
 
     /** The filter's distance limit in metres; null = no limit. */
     val maxDistance by lazy { MutableStateFlow(prefs.getFloat("max_distance", -1f).takeIf { it > 0 }?.toDouble()) }
+
+    // --- display settings ---------------------------------------------------------------------------------------
+    /** Keep the screen on while AR or Nav is showing. */
+    val keepScreenOn by lazy { MutableStateFlow(prefs.getBoolean("keep_screen_on", true)) }
+    /** Faint outlines of nearby buildings in AR (the targeted building is always highlighted). */
+    val buildingOutlines by lazy { MutableStateFlow(prefs.getBoolean("building_outlines", true)) }
+
+    fun setKeepScreenOn(on: Boolean) { keepScreenOn.value = on; prefs.edit().putBoolean("keep_screen_on", on).apply() }
+    fun setBuildingOutlines(on: Boolean) { buildingOutlines.value = on; prefs.edit().putBoolean("building_outlines", on).apply() }
 
     fun setMaxDistance(m: Double?) {
         maxDistance.value = m
@@ -116,7 +126,8 @@ class App : Application() {
         http = Http(cacheDir)
         location = LocationSource(this)
         orientation = OrientationSource(this)
-        registry = Registry(this, http, scope, allPlugins())
+        store = PluginStore(this, http).also { it.load() }
+        registry = Registry(this, http, scope, store.installed)
         scan = dev.omniscope.scan.ScanSession(this)
         ctx = location.fix.map { f -> f?.let { Ctx(Geo.round4(it.lat), Geo.round4(it.lon), it.altM, it.timeMs) } }
             .stateIn(scope, SharingStarted.Eagerly, null)

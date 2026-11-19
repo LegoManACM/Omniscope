@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "id": "aircraft",
+  "version": 1,
+  "name": "Aircraft",
+  "description": "Live ADS-B positions with altitude.",
+  "author": "Omniscope",
+  "source": "adsb.lol (fallback airplanes.live)",
+  "category": "transport",
+  "icon": "airplane-tilt",
+  "cost": "free",
+  "freshness": "live",
+  "tags": ["sky", "transport", "live"],
+  "radius": {
+    "default": 75000,
+    "min": 1000,
+    "max": 400000
+  },
+  "hosts": ["api.adsb.lol", "api.airplanes.live"],
+  "request": {
+    "urls": ["https://api.adsb.lol/v2/point/{lat}/{lon}/{radius_nm}", "https://api.airplanes.live/v2/point/{lat}/{lon}/{radius_nm}"]
+  },
+  "items": "$.ac[*]",
+  "item": {
+    "id": "$.hex",
+    "title": "$.flight | trim || $.r || $.hex",
+    "subtitle": "{$.desc || $.t} · {$.alt_geom | mul:0.3048 | thousands | suffix: m || $.alt_baro | num | mul:0.3048 | thousands | suffix: m || 'on the ground'} · {$.gs | round | suffix: kt}",
+    "lat": "$.lat",
+    "lon": "$.lon",
+    "altM": "$.alt_geom | mul:0.3048 || $.alt_baro | num | mul:0.3048",
+    "fields": [
+      ["Type", "$.desc || $.t"],
+      ["Registration", "$.r"],
+      ["Squawk", "$.squawk"],
+      ["Ground speed", "$.gs | round | suffix: kt"],
+      ["Track", "$.track | round | suffix:°"]
+    ],
+    "links": [
+      ["ADS-B track", "https://globe.adsb.lol/?icao={$.hex}"],
+      ["FlightAware", "https://www.flightaware.com/live/flight/{$.flight | trim}"]
+    ]
+  }
+}

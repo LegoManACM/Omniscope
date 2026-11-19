@@ -1,0 +1,414 @@
+{
+  "format": 1,
+  "plugins": [
+    {
+      "id": "gbif_occurrences",
+      "name": "Species records (GBIF)",
+      "version": 1,
+      "description": "Recorded sightings and specimens of plants, animals and fungi near you, from museums, surveys and citizen science.",
+      "author": "Omniscope (example community plugin)",
+      "category": "nature",
+      "icon": "leaf",
+      "cost": "free",
+      "tags": [
+        "nature",
+        "science"
+      ],
+      "official": false,
+      "path": "plugins/community/gbif_occurrences/plugin.json",
+      "sha256": "cf07973b7d28b6325677155c2b76d10068cab458f70680f15bdd28eaf5e51fe2",
+      "hosts": [
+        "api.gbif.org"
+      ]
+    },
+    {
+      "id": "air",
+      "name": "Air & pollen",
+      "version": 1,
+      "description": "Air quality, UV and pollen. Pollen is Europe-only.",
+      "author": "Omniscope",
+      "category": "conditions",
+      "icon": "wind",
+      "cost": "free",
+      "tags": [
+        "environment"
+      ],
+      "official": true,
+      "path": "plugins/official/air/plugin.json",
+      "sha256": "05aad1f47e8c93da3ade36732940f0f19c82c21ac70b41f457d437e144276234",
+      "hosts": [
+        "air-quality-api.open-meteo.com"
+      ]
+    },
+    {
+      "id": "aircraft",
+      "name": "Aircraft",
+      "version": 1,
+      "description": "Live ADS-B positions with altitude.",
+      "author": "Omniscope",
+      "category": "transport",
+      "icon": "airplane-tilt",
+      "cost": "free",
+      "tags": [
+        "sky",
+        "transport",
+        "live"
+      ],
+      "official": true,
+      "path": "plugins/official/aircraft/plugin.json",
+      "sha256": "693115de4bcda2d456a4a6530fc82c40cceac23e6222d85c1424a5372936c2ea",
+      "hosts": [
+        "api.adsb.lol",
+        "api.airplanes.live"
+      ]
+    },
+    {
+      "id": "alpr",
+      "name": "ALPR cameras",
+      "version": 1,
+      "description": "Licence-plate reader cameras, with the way each one faces. Mounting height is guessed when it isn't tagged.",
+      "author": "Omniscope",
+      "category": "surveillance",
+      "icon": "security-camera",
+      "cost": "free",
+      "tags": [
+        "surveillance",
+        "privacy"
+      ],
+      "native": "alpr",
+      "official": true,
+      "path": "plugins/official/alpr/plugin.json",
+      "sha256": "f2efc769c32eac0b8077d48f191222231b2773416182f847e80066963e3e3f25",
+      "hosts": []
+    },
+    {
+      "id": "buildings",
+      "name": "Buildings",
+      "version": 1,
+      "description": "3D outlines of buildings near you. In AR, aim at one to highlight it and see what's inside.",
+      "author": "Omniscope",
+      "category": "buildings",
+      "icon": "buildings",
+      "cost": "free",
+      "tags": [
+        "3d",
+        "place"
+      ],
+      "native": "buildings",
+      "official": true,
+      "path": "plugins/official/buildings/plugin.json",
+      "sha256": "3278212d59510b678a7fcdf7e985a94df2c9a65da3c07d66b94bc2b03849b351",
+      "hosts": []
+    },
+    {
+      "id": "iss",
+      "name": "ISS",
+      "version": 1,
+      "description": "The International Space Station right now. In AR it shows its true direction, even below the horizon.",
+      "author": "Omniscope",
+      "category": "sky",
+      "icon": "planet",
+      "cost": "free",
+      "tags": [
+        "sky",
+        "space",
+        "live"
+      ],
+      "official": true,
+      "path": "plugins/official/iss/plugin.json",
+      "sha256": "ae07371f939ce4a196c0481009449f2fed89216ac3cf2e44020078fe1849731d",
+      "hosts": [
+        "api.wheretheiss.at"
+      ]
+    },
+    {
+      "id": "nature",
+      "name": "Wildlife sightings",
+      "version": 1,
+      "description": "Recent wildlife and plant sightings.",
+      "author": "Omniscope",
+      "category": "nature",
+      "icon": "butterfly",
+      "cost": "free",
+      "tags": [
+        "nature"
+      ],
+      "official": true,
+      "path": "plugins/official/nature/plugin.json",
+      "sha256": "2019cb300d5370a15e6dd7a6ca6224685710fbeef5ad143ab76490dc9d62e6e2",
+      "hosts": [
+        "api.inaturalist.org"
+      ]
+    },
+    {
+      "id": "osm_places",
+      "name": "Nearby places",
+      "version": 1,
+      "description": "Named amenities, shops, sights and historic features.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "storefront",
+      "cost": "free",
+      "tags": [
+        "place",
+        "history"
+      ],
+      "official": true,
+      "path": "plugins/official/osm_places/plugin.json",
+      "sha256": "9828c3c7649d70aa07a85afbdd2c44eb7fb95f4002010a2fe14145076931b13e",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "peaks",
+      "name": "Peaks",
+      "version": 1,
+      "description": "Named peaks and volcanoes, with their elevations.",
+      "author": "Omniscope",
+      "category": "terrain",
+      "icon": "mountains",
+      "cost": "free",
+      "tags": [
+        "terrain",
+        "nature"
+      ],
+      "official": true,
+      "path": "plugins/official/peaks/plugin.json",
+      "sha256": "b1431d450540d1159c884f1d5d9383f47187fe193c51ba070037b12d2ddbc8c0",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "photos",
+      "name": "Photos taken here",
+      "version": 1,
+      "description": "Geotagged photos taken near you.",
+      "author": "Omniscope",
+      "category": "media",
+      "icon": "image",
+      "cost": "free",
+      "tags": [
+        "culture",
+        "history"
+      ],
+      "official": true,
+      "path": "plugins/official/photos/plugin.json",
+      "sha256": "38ca2a47bcd3bd5a171de94d63075c7bd93dedc5c5518aeb4d6a1f7b57bcc7ee",
+      "hosts": [
+        "commons.wikimedia.org"
+      ]
+    },
+    {
+      "id": "place",
+      "name": "Address",
+      "version": 1,
+      "description": "The address and areas you're in.",
+      "author": "Omniscope",
+      "category": "conditions",
+      "icon": "map-pin",
+      "cost": "free",
+      "tags": [
+        "place"
+      ],
+      "official": true,
+      "path": "plugins/official/place/plugin.json",
+      "sha256": "1f43b309224068ec5c6ff28658b1992cb402ee389779d9b35727c4c0dbc641dd",
+      "hosts": [
+        "nominatim.openstreetmap.org"
+      ]
+    },
+    {
+      "id": "quakes",
+      "name": "Earthquakes",
+      "version": 1,
+      "description": "Magnitude 2.5 and up in the last 14 days.",
+      "author": "Omniscope",
+      "category": "hazards",
+      "icon": "warning",
+      "cost": "free",
+      "tags": [
+        "hazard",
+        "terrain"
+      ],
+      "official": true,
+      "path": "plugins/official/quakes/plugin.json",
+      "sha256": "9f9eb2181a2ac76b5068efa5100827a58e2377f87abb6933da6257767c35dec6",
+      "hosts": [
+        "earthquake.usgs.gov"
+      ]
+    },
+    {
+      "id": "radio",
+      "name": "Radio stations",
+      "version": 1,
+      "description": "Internet radio stations based near you. Their stream link plays live.",
+      "author": "Omniscope",
+      "category": "media",
+      "icon": "radio",
+      "cost": "free",
+      "tags": [
+        "culture",
+        "media"
+      ],
+      "official": true,
+      "path": "plugins/official/radio/plugin.json",
+      "sha256": "aae76c5675e3e95a5793e813b3b80f9a9d07655ae564a8dfdf8422341b7808e7",
+      "hosts": [
+        "de1.api.radio-browser.info"
+      ]
+    },
+    {
+      "id": "scan_mlkit_barcodes",
+      "name": "Barcodes (ML Kit)",
+      "version": 1,
+      "description": "QR codes and barcodes of every common format. Closed source but free and offline.",
+      "author": "Omniscope",
+      "category": "scan",
+      "icon": "barcode",
+      "cost": "free",
+      "tags": [
+        "scan"
+      ],
+      "native": "scan_mlkit_barcodes",
+      "official": true,
+      "path": "plugins/official/scan_mlkit_barcodes/plugin.json",
+      "sha256": "b97bc097853f0ff4d47c17e16c8b3cd92a815cbbeed37b5f2a9c3d74a95c70c0",
+      "hosts": []
+    },
+    {
+      "id": "scan_mlkit_labels",
+      "name": "Objects (ML Kit)",
+      "version": 1,
+      "description": "Names what's in view (400+ everyday objects and scenes).",
+      "author": "Omniscope",
+      "category": "scan",
+      "icon": "tag",
+      "cost": "free",
+      "tags": [
+        "scan"
+      ],
+      "native": "scan_mlkit_labels",
+      "official": true,
+      "path": "plugins/official/scan_mlkit_labels/plugin.json",
+      "sha256": "50fdfcb83ada5d71037ad55a7c6fdcf0194bc351e34a81eb963c77aeadd2ef57",
+      "hosts": []
+    },
+    {
+      "id": "scan_mlkit_text",
+      "name": "Text (ML Kit)",
+      "version": 1,
+      "description": "Reads Latin-script text: signs, labels, plaques.",
+      "author": "Omniscope",
+      "category": "scan",
+      "icon": "text-t",
+      "cost": "free",
+      "tags": [
+        "scan"
+      ],
+      "native": "scan_mlkit_text",
+      "official": true,
+      "path": "plugins/official/scan_mlkit_text/plugin.json",
+      "sha256": "a6057f25243364988666b4da5b994c5cc4c14960fad5613b1fe6c48d100c18b9",
+      "hosts": []
+    },
+    {
+      "id": "scan_zxing_barcodes",
+      "name": "Barcodes (ZXing)",
+      "version": 1,
+      "description": "Open-source QR and barcode reader. Finds one code per frame.",
+      "author": "Omniscope",
+      "category": "scan",
+      "icon": "barcode",
+      "cost": "free",
+      "tags": [
+        "scan"
+      ],
+      "native": "scan_zxing_barcodes",
+      "official": true,
+      "path": "plugins/official/scan_zxing_barcodes/plugin.json",
+      "sha256": "ec266af8c1eef442156ff466093563a00fb519ed6f6fce0a5941205cc6f7f429",
+      "hosts": []
+    },
+    {
+      "id": "sky",
+      "name": "Sun & Moon",
+      "version": 1,
+      "description": "Where the Sun and Moon are, computed on the phone. Aim at either and use Align compass to fix your heading.",
+      "author": "Omniscope",
+      "category": "sky",
+      "icon": "sun",
+      "cost": "free",
+      "tags": [
+        "sky",
+        "calibration"
+      ],
+      "native": "sky",
+      "official": true,
+      "path": "plugins/official/sky/plugin.json",
+      "sha256": "50793168fae0f4e9643f20b3f7dd6bbb124f7d13cea78ce0ac16546b3d00f24b",
+      "hosts": []
+    },
+    {
+      "id": "weather",
+      "name": "Weather",
+      "version": 1,
+      "description": "Current conditions and a 5-day forecast.",
+      "author": "Omniscope",
+      "category": "conditions",
+      "icon": "cloud-sun",
+      "cost": "free",
+      "tags": [
+        "weather"
+      ],
+      "native": "weather",
+      "official": true,
+      "path": "plugins/official/weather/plugin.json",
+      "sha256": "d99ea887fccbf204cb2e59084e8a8463fb12ffe830fa24917b16f5ac0be883f9",
+      "hosts": []
+    },
+    {
+      "id": "webcams",
+      "name": "Webcams",
+      "version": 1,
+      "description": "Public webcams with live preview images.",
+      "author": "Omniscope",
+      "category": "media",
+      "icon": "webcam",
+      "cost": "freemium",
+      "tags": [
+        "media",
+        "weather"
+      ],
+      "official": true,
+      "path": "plugins/official/webcams/plugin.json",
+      "sha256": "2daa23ad1e5552dab0addf24e53d7ed98aeb9aba1f89330ad472e80779366400",
+      "hosts": [
+        "api.windy.com"
+      ]
+    },
+    {
+      "id": "wikipedia",
+      "name": "Wikipedia",
+      "version": 1,
+      "description": "Articles about places near you.",
+      "author": "Omniscope",
+      "category": "history",
+      "icon": "book-open",
+      "cost": "free",
+      "tags": [
+        "history",
+        "culture"
+      ],
+      "official": true,
+      "path": "plugins/official/wikipedia/plugin.json",
+      "sha256": "27c18eea145e472a32932037e2ae0c3633dfc060d354fd3bda01a638c6acfad4",
+      "hosts": [
+        "en.wikipedia.org"
+      ]
+    }
+  ]
+}

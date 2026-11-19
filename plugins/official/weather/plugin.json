@@ -1,0 +1,16 @@
+{
+  "format": 1,
+  "id": "weather",
+  "version": 1,
+  "name": "Weather",
+  "description": "Current conditions and a 5-day forecast.",
+  "author": "Omniscope",
+  "source": "Open-Meteo",
+  "category": "conditions",
+  "icon": "cloud-sun",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["weather"],
+  "ambient": true,
+  "native": "weather"
+}

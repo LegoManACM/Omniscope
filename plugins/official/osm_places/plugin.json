@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "osm_places",
+  "version": 1,
+  "name": "Nearby places",
+  "description": "Named amenities, shops, sights and historic features.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "places",
+  "icon": "storefront",
+  "cost": "free",
+  "freshness": "static",
+  "tags": ["place", "history"],
+  "radius": {
+    "default": 500,
+    "min": 25,
+    "max": 3000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[amenity][name];nwr(around:{radius_m},{lat},{lon})[tourism][name];nwr(around:{radius_m},{lat},{lon})[historic][name];nwr(around:{radius_m},{lat},{lon})[shop][name];nwr(around:{radius_m},{lat},{lon})[leisure][name];);out center tags 200;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name",
+    "subtitle": "$.tags.historic | prefix:'historic ' || $.tags.tourism || $.tags.amenity || $.tags.shop || $.tags.leisure",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "fields": [
+      ["Address", "{$.tags['addr:housenumber']} {$.tags['addr:street']}"],
+      ["Opening hours", "$.tags.opening_hours"],
+      ["Phone", "$.tags.phone || $.tags['contact:phone']"],
+      ["Cuisine", "$.tags.cuisine | replace:';=>, '"],
+      ["Website", "$.tags.website || $.tags['contact:website']"]
+    ],
+    "links": [
+      ["Website", "$.tags.website | url || $.tags['contact:website'] | url"],
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"],
+      ["Wikipedia", "$.tags.wikipedia | wikiurl"]
+    ]
+  }
+}

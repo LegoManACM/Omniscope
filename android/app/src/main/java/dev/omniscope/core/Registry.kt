@@ -22,18 +22,25 @@ data class PluginState(
 )
 
 /** Holds the plugins, which are switched on, their keys and quotas, and their latest results. */
-class Registry(context: Context, private val http: Http, private val scope: CoroutineScope, val plugins: List<Plugin>) {
+class Registry(context: Context, private val http: Http, private val scope: CoroutineScope, val installed: StateFlow<List<Plugin>>) {
     private val prefs = context.getSharedPreferences("registry", Context.MODE_PRIVATE)
 
-    val enabled = MutableStateFlow(run {
-        // Free plugins are on by default, including ones added in an app update after you'd saved your choices.
+    /** The installed plugins right now (the list changes as plugins are installed and removed). */
+    val plugins: List<Plugin> get() = installed.value
+
+    val enabled = MutableStateFlow(prefs.getStringSet("enabled", null)?.toSet() ?: emptySet())
+
+    /** Plugins switch on when first seen (installed, or new in an app update) if they're on by default. */
+    private fun noticeNew(list: List<Plugin>) {
         val known = prefs.getStringSet("known", null)?.toSet() ?: emptySet()
-        val saved = prefs.getStringSet("enabled", null)?.toSet()
-        val newFree = plugins.filter { it.defaultOn && it.id !in known }.map { it.id }.toSet()
-        val result = (saved ?: emptySet()) + newFree
-        prefs.edit().putStringSet("known", plugins.map { it.id }.toSet()).putStringSet("enabled", result).apply()
-        result
-    })
+        val fresh = list.filter { it.id !in known }
+        if (fresh.isEmpty()) return
+        enabled.value = enabled.value + fresh.filter { it.defaultOn }.map { it.id }
+        prefs.edit().putStringSet("known", known + fresh.map { it.id }).putStringSet("enabled", enabled.value).apply()
+        val k = keys.value.toMutableMap()
+        fresh.filter { it.key != null && it.id !in k }.forEach { k[it.id] = prefs.getString("key_${it.id}", "") ?: "" }
+        keys.value = k
+    }
     val freeOnly = MutableStateFlow(prefs.getBoolean("free_only", false))
     val keys = MutableStateFlow(plugins.mapNotNull { p -> p.key?.let { p.id to (prefs.getString("key_${p.id}", "") ?: "") } }.toMap())
     val states = MutableStateFlow<Map<String, PluginState>>(emptyMap())
@@ -41,15 +48,23 @@ class Registry(context: Context, private val http: Http, private val scope: Coro
     /** False while the app is in the background: nothing is fetched. */
     val running = MutableStateFlow(false)
 
-    private val byId = plugins.associateBy { it.id }
-    fun plugin(id: String): Plugin = byId.getValue(id)
+    /** The plugin with this id, or a placeholder if it was just removed (so views never crash on stale items). */
+    fun plugin(id: String): Plugin = plugins.firstOrNull { it.id == id } ?: MissingPlugin(id)
+
+    init {
+        noticeNew(installed.value)
+        scope.launch { installed.collect { list ->
+            noticeNew(list)
+            states.update { s -> s.filterKeys { id -> list.any { it.id == id } } } // drop results of removed plugins
+        } }
+    }
 
     fun isActive(p: Plugin): Boolean =
         p.id in enabled.value && !(freeOnly.value && p.cost != Cost.FREE) && (p.key == null || !keys.value[p.id].isNullOrBlank())
 
     /** Items from every active plugin. */
-    val items: StateFlow<List<Item>> = combine(states, enabled, freeOnly, keys) { s, _, _, _ ->
-        plugins.filter { isActive(it) }.flatMap { s[it.id]?.items.orEmpty() }
+    val items: StateFlow<List<Item>> = combine(states, enabled, freeOnly, keys, installed) { s, _, _, _, list ->
+        list.filter { isActive(it) }.flatMap { s[it.id]?.items.orEmpty() }
     }.stateIn(scope, SharingStarted.Eagerly, emptyList())
 
     fun setEnabled(id: String, on: Boolean) {
@@ -162,4 +177,16 @@ class Registry(context: Context, private val http: Http, private val scope: Coro
     private fun update(id: String, f: (PluginState) -> PluginState) {
         states.update { it + (id to f(it[id] ?: PluginState())) }
     }
+}
+
+/** Stands in for a plugin that has just been removed. */
+private class MissingPlugin(override val id: String) : Plugin {
+    override val name = id
+    override val icon = Category.PLACES.icon
+    override val category = Category.PLACES
+    override val description = ""
+    override val tags = emptyList<String>()
+    override val cost = Cost.FREE
+    override val freshness = Freshness.STATIC
+    override suspend fun fetch(ctx: Ctx, env: PluginEnv) = emptyList<Item>()
 }

@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "peaks",
+  "version": 1,
+  "name": "Peaks",
+  "description": "Named peaks and volcanoes, with their elevations.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "terrain",
+  "icon": "mountains",
+  "cost": "free",
+  "freshness": "static",
+  "tags": ["terrain", "nature"],
+  "radius": {
+    "default": 40000,
+    "min": 1000,
+    "max": 150000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];node(around:{radius_m},{lat},{lon})[natural~\"^(peak|volcano)$\"][name];out 300;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "$.id",
+    "title": "$.tags.name",
+    "subtitle": "$.tags.ele | num | round | suffix: m",
+    "lat": "$.lat",
+    "lon": "$.lon",
+    "altM": "$.tags.ele | num",
+    "fields": [
+      ["Elevation", "$.tags.ele | num | round | suffix: m"],
+      ["Prominence", "$.tags.prominence"]
+    ],
+    "links": [
+      ["OpenStreetMap", "https://www.openstreetmap.org/node/{$.id}"],
+      ["Wikipedia", "$.tags.wikipedia | wikiurl"]
+    ]
+  }
+}

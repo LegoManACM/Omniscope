@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "scan_mlkit_barcodes",
+  "version": 1,
+  "name": "Barcodes (ML Kit)",
+  "description": "QR codes and barcodes of every common format. Closed source but free and offline.",
+  "author": "Omniscope",
+  "source": "Google ML Kit, on the phone",
+  "category": "scan",
+  "icon": "barcode",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["scan"],
+  "native": "scan_mlkit_barcodes"
+}

@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "id": "webcams",
+  "version": 1,
+  "name": "Webcams",
+  "description": "Public webcams with live preview images.",
+  "author": "Omniscope",
+  "source": "Windy Webcams API",
+  "category": "media",
+  "icon": "webcam",
+  "cost": "freemium",
+  "freshness": "slow",
+  "tags": ["media", "weather"],
+  "radius": {
+    "default": 50000,
+    "min": 1000,
+    "max": 250000
+  },
+  "key": {
+    "label": "Windy Webcams API key",
+    "signup": "https://api.windy.com/keys"
+  },
+  "dailyLimit": 300,
+  "hosts": ["api.windy.com"],
+  "request": {
+    "url": "https://api.windy.com/webcams/api/v3/webcams?nearby={lat},{lon},{radius_km}&include=images,location,urls&limit=50",
+    "headers": {
+      "x-windy-api-key": "{key}"
+    }
+  },
+  "items": "$.webcams[*]",
+  "item": {
+    "id": "$.webcamId",
+    "title": "$.title",
+    "subtitle": "$.location.city",
+    "lat": "$.location.latitude",
+    "lon": "$.location.longitude",
+    "image": "$.images.current.preview",
+    "links": [
+      ["Windy webcam page", "$.urls.detail || 'https://www.windy.com/webcams'"]
+    ]
+  }
+}

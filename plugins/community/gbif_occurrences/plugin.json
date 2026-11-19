@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "gbif_occurrences",
+  "version": 1,
+  "name": "Species records (GBIF)",
+  "description": "Recorded sightings and specimens of plants, animals and fungi near you, from museums, surveys and citizen science.",
+  "author": "Omniscope (example community plugin)",
+  "source": "GBIF, the Global Biodiversity Information Facility",
+  "category": "nature",
+  "icon": "leaf",
+  "cost": "free",
+  "freshness": "static",
+  "tags": ["nature", "science"],
+  "radius": {"default": 2000, "min": 100, "max": 50000},
+  "hosts": ["api.gbif.org"],
+  "request": {
+    "url": "https://api.gbif.org/v1/occurrence/search?geoDistance={lat},{lon},{radius_km:2}km&limit=100&hasCoordinate=true&occurrenceStatus=PRESENT"
+  },
+  "items": "$.results[*]",
+  "item": {
+    "id": "$.key",
+    "title": "$.vernacularName | cap || $.species || $.scientificName",
+    "subtitle": "{$.scientificName} · {$.eventDate | date}",
+    "lat": "$.decimalLatitude",
+    "lon": "$.decimalLongitude",
+    "image": "$.media[0].identifier",
+    "fields": [
+      ["Kingdom", "$.kingdom"],
+      ["Recorded", "$.eventDate | date"],
+      ["Basis", "$.basisOfRecord | replace:'_=> ' | lower | cap"],
+      ["Dataset", "$.datasetName"]
+    ],
+    "links": [["GBIF record", "https://www.gbif.org/occurrence/{$.key}"]]
+  }
+}

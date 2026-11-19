@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "radio",
+  "version": 1,
+  "name": "Radio stations",
+  "description": "Internet radio stations based near you. Their stream link plays live.",
+  "author": "Omniscope",
+  "source": "Radio Browser",
+  "category": "media",
+  "icon": "radio",
+  "cost": "free",
+  "freshness": "static",
+  "tags": ["culture", "media"],
+  "radius": {
+    "default": 150000,
+    "min": 1000,
+    "max": 1000000
+  },
+  "hosts": ["de1.api.radio-browser.info"],
+  "request": {
+    "url": "https://de1.api.radio-browser.info/json/stations/search?geo_lat={lat}&geo_long={lon}&geo_distance={radius_m}&has_geo_info=true&hidebroken=true&order=clickcount&reverse=true&limit=60"
+  },
+  "items": "$[*]",
+  "item": {
+    "id": "$.stationuuid",
+    "title": "$.name | trim",
+    "subtitle": "$.tags | replace:',=>, ' | take:60",
+    "lat": "$.geo_lat",
+    "lon": "$.geo_long",
+    "image": "$.favicon",
+    "fields": [
+      ["Codec", "$.codec"],
+      ["Bitrate", "$.bitrate | nonzero | suffix: kbps"]
+    ],
+    "links": [
+      ["Listen live", "$.url_resolved || $.url"],
+      ["Website", "$.homepage | url"]
+    ]
+  }
+}

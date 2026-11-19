@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "air",
+  "version": 1,
+  "name": "Air & pollen",
+  "description": "Air quality, UV and pollen. Pollen is Europe-only.",
+  "author": "Omniscope",
+  "source": "Open-Meteo (CAMS)",
+  "category": "conditions",
+  "icon": "wind",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["environment"],
+  "ambient": true,
+  "hosts": ["air-quality-api.open-meteo.com"],
+  "request": {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality?latitude={lat}&longitude={lon}&current=us_aqi,european_aqi,pm2_5,pm10,ozone,nitrogen_dioxide,uv_index,grass_pollen,birch_pollen,ragweed_pollen"
+  },
+  "items": "$.current",
+  "item": {
+    "id": "'now'",
+    "title": "Air quality {$.us_aqi | round} (US AQI)",
+    "subtitle": "EU AQI {$.european_aqi | round}",
+    "fields": [
+      ["PM2.5", "$.pm2_5 | suffix: µg/m³"],
+      ["PM10", "$.pm10 | suffix: µg/m³"],
+      ["Ozone", "$.ozone | suffix: µg/m³"],
+      ["NO₂", "$.nitrogen_dioxide | suffix: µg/m³"],
+      ["UV index", "$.uv_index"],
+      ["Grass pollen", "$.grass_pollen | suffix: /m³"],
+      ["Birch pollen", "$.birch_pollen | suffix: /m³"],
+      ["Ragweed pollen", "$.ragweed_pollen | suffix: /m³"]
+    ]
+  }
+}

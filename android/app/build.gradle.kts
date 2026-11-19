@@ -34,6 +34,14 @@ android {
     }
 }
 
+// The official plugin manifests (repo/plugins/official) ship inside the app, preloaded on first run.
+val bundleOfficialPlugins by tasks.registering(Copy::class) {
+    from(rootProject.file("../plugins/official"))
+    into(layout.projectDirectory.dir("src/main/assets/plugins/official"))
+    include("*/plugin.json")
+}
+tasks.named("preBuild") { dependsOn(bundleOfficialPlugins) }
+
 dependencies {
     // No Google Play Services: location comes from the platform LocationManager, AR from the platform sensors.
     implementation(platform("androidx.compose:compose-bom:2025.09.00"))
@@ -57,4 +65,6 @@ dependencies {
     implementation("org.nanohttpd:nanohttpd:2.3.1")
 
     testImplementation("junit:junit:4.13.2")
+    // Android's org.json is a stub in local unit tests; this is the real one.
+    testImplementation("org.json:json:20240303")
 }

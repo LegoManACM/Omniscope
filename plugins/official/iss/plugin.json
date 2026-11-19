@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "iss",
+  "version": 1,
+  "name": "ISS",
+  "description": "The International Space Station right now. In AR it shows its true direction, even below the horizon.",
+  "author": "Omniscope",
+  "source": "wheretheiss.at",
+  "category": "sky",
+  "icon": "planet",
+  "cost": "free",
+  "freshness": "live",
+  "tags": ["sky", "space", "live"],
+  "hosts": ["api.wheretheiss.at"],
+  "request": {
+    "url": "https://api.wheretheiss.at/v1/satellites/25544"
+  },
+  "items": "$",
+  "item": {
+    "id": "'25544'",
+    "title": "'International Space Station'",
+    "subtitle": "{$.altitude | round | suffix: km up} · {$.visibility}",
+    "lat": "$.latitude",
+    "lon": "$.longitude",
+    "altM": "$.altitude | mul:1000",
+    "fields": [
+      ["Speed", "$.velocity | thousands | suffix: km/h"],
+      ["In sunlight", "$.visibility"]
+    ],
+    "links": [
+      ["Where the ISS is", "'https://wheretheiss.at'"],
+      ["NASA: Spot the Station", "'https://spotthestation.nasa.gov'"]
+    ]
+  }
+}

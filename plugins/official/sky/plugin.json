@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "id": "sky",
+  "version": 1,
+  "name": "Sun & Moon",
+  "description": "Where the Sun and Moon are, computed on the phone. Aim at either and use Align compass to fix your heading.",
+  "author": "Omniscope",
+  "source": "Computed on the phone",
+  "category": "sky",
+  "icon": "sun",
+  "cost": "free",
+  "freshness": "live",
+  "tags": ["sky", "calibration"],
+  "native": "sky"
+}

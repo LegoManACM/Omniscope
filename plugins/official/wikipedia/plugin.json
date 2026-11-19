@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "id": "wikipedia",
+  "version": 1,
+  "name": "Wikipedia",
+  "description": "Articles about places near you.",
+  "author": "Omniscope",
+  "source": "Wikipedia GeoSearch",
+  "category": "history",
+  "icon": "book-open",
+  "cost": "free",
+  "freshness": "static",
+  "tags": ["history", "culture"],
+  "radius": {
+    "default": 10000,
+    "min": 50,
+    "max": 10000
+  },
+  "hosts": ["en.wikipedia.org"],
+  "request": {
+    "url": "https://en.wikipedia.org/w/api.php?action=query&generator=geosearch&ggscoord={lat}%7C{lon}&ggsradius={radius_m}&ggslimit=50&prop=coordinates%7Cpageimages%7Cextracts&exintro=1&explaintext=1&exsentences=3&exlimit=50&pithumbsize=640&pilimit=50&colimit=50&format=json"
+  },
+  "items": "$.query.pages.*",
+  "item": {
+    "id": "$.pageid",
+    "title": "$.title",
+    "subtitle": "$.extract | take:160",
+    "lat": "$.coordinates[0].lat",
+    "lon": "$.coordinates[0].lon",
+    "image": "$.thumbnail.source",
+    "fields": [
+      ["Summary", "$.extract"]
+    ],
+    "links": [
+      ["Wikipedia", "https://en.wikipedia.org/?curid={$.pageid}"]
+    ]
+  }
+}

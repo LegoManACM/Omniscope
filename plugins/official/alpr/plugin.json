@@ -1,0 +1,20 @@
+{
+  "format": 1,
+  "id": "alpr",
+  "version": 1,
+  "name": "ALPR cameras",
+  "description": "Licence-plate reader cameras, with the way each one faces. Mounting height is guessed when it isn't tagged.",
+  "author": "Omniscope",
+  "source": "DeFlock / OpenStreetMap contributors",
+  "category": "surveillance",
+  "icon": "security-camera",
+  "cost": "free",
+  "freshness": "static",
+  "tags": ["surveillance", "privacy"],
+  "radius": {
+    "default": 15000,
+    "min": 100,
+    "max": 100000
+  },
+  "native": "alpr"
+}

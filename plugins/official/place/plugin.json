@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "id": "place",
+  "version": 1,
+  "name": "Address",
+  "description": "The address and areas you're in.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap Nominatim (max 1 request a second)",
+  "category": "conditions",
+  "icon": "map-pin",
+  "cost": "free",
+  "freshness": "slow",
+  "tags": ["place"],
+  "ambient": true,
+  "hosts": ["nominatim.openstreetmap.org"],
+  "request": {
+    "url": "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat={lat}&lon={lon}&zoom=18&addressdetails=1&accept-language=en"
+  },
+  "error": "$.error",
+  "items": "$",
+  "item": {
+    "id": "'here'",
+    "title": "$.name || $.address.road || $.address.suburb || 'Unnamed place'",
+    "subtitle": "$.display_name",
+    "fields": [
+      ["Road", "$.address.road"],
+      ["Area", "$.address.neighbourhood || $.address.suburb"],
+      ["City", "$.address.city || $.address.town || $.address.village || $.address.hamlet"],
+      ["County", "$.address.county"],
+      ["State", "$.address.state"],
+      ["Postcode", "$.address.postcode"],
+      ["Country", "$.address.country"]
+    ],
+    "links": [
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.osm_type}/{$.osm_id}"]
+    ]
+  }
+}
