@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "tide_stations",
+  "version": 1,
+  "name": "Tide stations (NOAA)",
+  "description": "NOAA tide prediction stations on US coasts and territories; nothing inland.",
+  "author": "Omniscope",
+  "source": "NOAA CO-OPS",
+  "category": "nature",
+  "icon": "wind",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["tide", "ocean", "coast", "water"],
+  "radius": {
+    "default": 100000,
+    "min": 5000,
+    "max": 500000
+  },
+  "hosts": ["api.tidesandcurrents.noaa.gov", "tidesandcurrents.noaa.gov"],
+  "request": {
+    "url": "https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json?type=tidepredictions"
+  },
+  "items": "$.stations[*]",
+  "item": {
+    "id": "$.id",
+    "title": "$.name || 'Tide station'",
+    "subtitle": "{$.state} · station {$.id}",
+    "lat": "$.lat",
+    "lon": "$.lng",
+    "fields": [
+      ["State", "$.state"],
+      ["Station ID", "$.id"],
+      ["Reference station", "$.reference_id"]
+    ],
+    "links": [
+      ["NOAA station page", "https://tidesandcurrents.noaa.gov/stationhome.html?id={$.id}"]
+    ]
+  }
+}

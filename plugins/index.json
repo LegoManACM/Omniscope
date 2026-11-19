@@ -101,6 +101,98 @@
       "hosts": []
     },
     {
+      "id": "elevation",
+      "name": "Ground elevation",
+      "version": 1,
+      "description": "Height of the ground above sea level at your location.",
+      "author": "Omniscope",
+      "category": "terrain",
+      "icon": "mountains",
+      "cost": "free",
+      "tags": [
+        "terrain",
+        "altitude"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/elevation/plugin.json",
+      "sha256": "3584cd065569e413df9056146092be1624021732bfaa979468a8d656cc5df582",
+      "hosts": [
+        "api.open-meteo.com"
+      ]
+    },
+    {
+      "id": "eonet_events",
+      "name": "Natural events (NASA EONET)",
+      "version": 1,
+      "description": "Open wildfires, storms, volcanoes, floods and other natural events tracked by NASA, worldwide.",
+      "author": "Omniscope",
+      "category": "hazards",
+      "icon": "warning",
+      "cost": "free",
+      "tags": [
+        "hazard",
+        "wildfire",
+        "storm",
+        "volcano",
+        "flood",
+        "nasa"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/eonet_events/plugin.json",
+      "sha256": "aa58e0bad5c16055492e47f2c79d85cd174b4ce4274f14fda6d80dcad0e8b721",
+      "hosts": [
+        "eonet.gsfc.nasa.gov"
+      ]
+    },
+    {
+      "id": "fossils",
+      "name": "Fossil finds (PBDB)",
+      "version": 1,
+      "description": "Fossil occurrences recorded in the Paleobiology Database, with their geological age; worldwide, up to 200 per search.",
+      "author": "Omniscope",
+      "category": "terrain",
+      "icon": "mountains",
+      "cost": "free",
+      "tags": [
+        "fossil",
+        "paleontology",
+        "geology",
+        "science",
+        "history"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/fossils/plugin.json",
+      "sha256": "ebca386bdec26de6132f6e97bee2c11337b2ae63d88509d4b5b13243bbadbd82",
+      "hosts": [
+        "paleobiodb.org"
+      ]
+    },
+    {
+      "id": "geology",
+      "name": "Bedrock geology",
+      "version": 1,
+      "description": "The rock units mapped under your feet, with lithology and age.",
+      "author": "Omniscope",
+      "category": "terrain",
+      "icon": "mountains",
+      "cost": "free",
+      "tags": [
+        "geology",
+        "rock",
+        "terrain"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/geology/plugin.json",
+      "sha256": "dfaac838f425bf7268fdb396b2fc5b4e6c7dfe507807dec5f6b3026958c7da69",
+      "hosts": [
+        "macrostrat.org"
+      ]
+    },
+    {
       "id": "iss",
       "name": "ISS",
       "version": 1,
@@ -119,6 +211,28 @@
       "sha256": "ae07371f939ce4a196c0481009449f2fed89216ac3cf2e44020078fe1849731d",
       "hosts": [
         "api.wheretheiss.at"
+      ]
+    },
+    {
+      "id": "marine",
+      "name": "Sea state",
+      "version": 1,
+      "description": "Wave, swell and sea-surface conditions at your location. Only meaningful on or near the coast.",
+      "author": "Omniscope",
+      "category": "conditions",
+      "icon": "wind",
+      "cost": "free",
+      "tags": [
+        "sea",
+        "waves",
+        "weather"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/marine/plugin.json",
+      "sha256": "39b0d7303c222989eac596d59c3fae34694c4aa29f675de42d195e5e2f76506b",
+      "hosts": [
+        "marine-api.open-meteo.com"
       ]
     },
     {
@@ -141,6 +255,165 @@
       ]
     },
     {
+      "id": "nws_alerts",
+      "name": "Weather alerts (US)",
+      "version": 1,
+      "description": "Active US National Weather Service watches, warnings and advisories for your location. US only; no cards when nothing is active.",
+      "author": "Omniscope",
+      "category": "hazards",
+      "icon": "warning",
+      "cost": "free",
+      "tags": [
+        "weather",
+        "hazard",
+        "alerts",
+        "us"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/nws_alerts/plugin.json",
+      "sha256": "a451a2b6bc8db236c418f142aad99cdda6bc896226431ecb29e12f38df141567",
+      "hosts": [
+        "api.weather.gov"
+      ]
+    },
+    {
+      "id": "opensky",
+      "name": "Aircraft (OpenSky)",
+      "version": 1,
+      "description": "Live aircraft positions from the OpenSky Network; anonymous access is limited to about 400 requests a day, so use it sparingly.",
+      "author": "Omniscope",
+      "category": "transport",
+      "icon": "airplane-tilt",
+      "cost": "free",
+      "tags": [
+        "sky",
+        "transport",
+        "live",
+        "aircraft"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/opensky/plugin.json",
+      "sha256": "a0ea0cd6f5f48805578a3247b8d5b28bdf4db74706520f339c971ff79b431412",
+      "hosts": [
+        "opensky-network.org"
+      ]
+    },
+    {
+      "id": "osm_cctv",
+      "name": "Surveillance cameras",
+      "version": 1,
+      "description": "CCTV and surveillance cameras mapped in OpenStreetMap, excluding licence plate readers.",
+      "author": "Omniscope",
+      "category": "surveillance",
+      "icon": "eye",
+      "cost": "free",
+      "tags": [
+        "cctv",
+        "camera",
+        "surveillance"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_cctv/plugin.json",
+      "sha256": "97d425fd09cc03206caa4e0e04e85dc5c6222ea44998f25ccbc1af91c26d8192",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "osm_defibrillators",
+      "name": "Defibrillators (AED)",
+      "version": 1,
+      "description": "Public automated external defibrillators.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "info",
+      "cost": "free",
+      "tags": [
+        "aed",
+        "emergency",
+        "health"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_defibrillators/plugin.json",
+      "sha256": "ff1591be1cc75bb8ae4d402d303df390b3ef69bd971a25cc0c9bf8a645889b4a",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "osm_drinking_water",
+      "name": "Drinking water",
+      "version": 1,
+      "description": "Drinking water taps and fountains.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "map-pin",
+      "cost": "free",
+      "tags": [
+        "water",
+        "places"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_drinking_water/plugin.json",
+      "sha256": "4d836453cd3cade1e7d6d0405c60fa55ab7203b977c963f73e560deaf1f67f62",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "osm_ev_charging",
+      "name": "EV charging",
+      "version": 1,
+      "description": "Electric vehicle charging stations and their connectors.",
+      "author": "Omniscope",
+      "category": "transport",
+      "icon": "navigation-arrow",
+      "cost": "free",
+      "tags": [
+        "ev",
+        "charging",
+        "transport"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_ev_charging/plugin.json",
+      "sha256": "ca0e5cd03e74d778e87dc678349487356c1b679b58b34c6212a66429e67f5fe3",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "osm_notes",
+      "name": "Open map notes",
+      "version": 1,
+      "description": "Unresolved OpenStreetMap notes (community map bug reports) near you.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "info",
+      "cost": "free",
+      "tags": [
+        "osm",
+        "map",
+        "community"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_notes/plugin.json",
+      "sha256": "fc0f67cf5ecaefffa5f831b7df9beacf914072868d8e8d9086aa40fb1b3cb2e1",
+      "hosts": [
+        "api.openstreetmap.org"
+      ]
+    },
+    {
       "id": "osm_places",
       "name": "Nearby places",
       "version": 1,
@@ -159,6 +432,122 @@
       "hosts": [
         "overpass-api.de",
         "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "osm_public_art",
+      "name": "Public art",
+      "version": 1,
+      "description": "Murals, sculptures, statues and other public artworks.",
+      "author": "Omniscope",
+      "category": "history",
+      "icon": "image",
+      "cost": "free",
+      "tags": [
+        "art",
+        "mural",
+        "sculpture",
+        "history"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_public_art/plugin.json",
+      "sha256": "8dfe377296573401402b1d1936ff54c02572ea4915f283f2e8e30fee857971f3",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "osm_speed_cameras",
+      "name": "Speed cameras",
+      "version": 1,
+      "description": "Speed and red-light enforcement cameras.",
+      "author": "Omniscope",
+      "category": "surveillance",
+      "icon": "warning",
+      "cost": "free",
+      "tags": [
+        "speed camera",
+        "red light",
+        "enforcement",
+        "traffic"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_speed_cameras/plugin.json",
+      "sha256": "b53d9a770f04d61475d72c095076824a97f3aef151985bd02cd0f8154ac34a3c",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "osm_toilets",
+      "name": "Public toilets",
+      "version": 1,
+      "description": "Public toilets, with access, fees and accessibility.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "map-pin",
+      "cost": "free",
+      "tags": [
+        "toilets",
+        "places"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_toilets/plugin.json",
+      "sha256": "9bafdba1dfc9378a17420d1e44b392cce3c0530361bd011492525de47a73a96e",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "osm_viewpoints",
+      "name": "Viewpoints and waterfalls",
+      "version": 1,
+      "description": "Scenic viewpoints and waterfalls.",
+      "author": "Omniscope",
+      "category": "terrain",
+      "icon": "eye",
+      "cost": "free",
+      "tags": [
+        "viewpoint",
+        "waterfall",
+        "scenic",
+        "terrain"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/osm_viewpoints/plugin.json",
+      "sha256": "afaf748450dcdea4a3b3eee00ac9d6646e4a81ad1ace9425e11d45c7b1f68879",
+      "hosts": [
+        "overpass-api.de",
+        "overpass.private.coffee"
+      ]
+    },
+    {
+      "id": "panoramax",
+      "name": "Street-level photos",
+      "version": 1,
+      "description": "Open street-level photos from Panoramax near you (coverage varies, strongest in France and Europe).",
+      "author": "Omniscope",
+      "category": "media",
+      "icon": "camera",
+      "cost": "free",
+      "tags": [
+        "street",
+        "photos",
+        "openstreetmap"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/panoramax/plugin.json",
+      "sha256": "1362839ab674028b8e443da313f897e99f6761af66f989e448f5d3ce550a302f",
+      "hosts": [
+        "api.panoramax.xyz"
       ]
     },
     {
@@ -222,6 +611,28 @@
       ]
     },
     {
+      "id": "police_uk_crime",
+      "name": "Street crime (UK)",
+      "version": 1,
+      "description": "Recorded street-level crimes within about a mile of you, latest published month; England, Wales and Northern Ireland only.",
+      "author": "Omniscope",
+      "category": "hazards",
+      "icon": "warning",
+      "cost": "free",
+      "tags": [
+        "crime",
+        "safety",
+        "uk"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/police_uk_crime/plugin.json",
+      "sha256": "576c99a861e16581027ee41871dc4becd0fb5ba5b73c560255078f35db750b1a",
+      "hosts": [
+        "data.police.uk"
+      ]
+    },
+    {
       "id": "quakes",
       "name": "Earthquakes",
       "version": 1,
@@ -259,6 +670,51 @@
       "sha256": "aae76c5675e3e95a5793e813b3b80f9a9d07655ae564a8dfdf8422341b7808e7",
       "hosts": [
         "de1.api.radio-browser.info"
+      ]
+    },
+    {
+      "id": "river_flow",
+      "name": "River flow",
+      "version": 1,
+      "description": "Modelled river discharge at the nearest river to you, with the week's forecast peak.",
+      "author": "Omniscope",
+      "category": "hazards",
+      "icon": "warning",
+      "cost": "free",
+      "tags": [
+        "water",
+        "flood",
+        "river"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/river_flow/plugin.json",
+      "sha256": "d51daaef79855932f931fe1c2ac32fc15365ab4fa1fc6185bbb5c39dea2b8238",
+      "hosts": [
+        "flood-api.open-meteo.com"
+      ]
+    },
+    {
+      "id": "safecast",
+      "name": "Radiation readings (Safecast)",
+      "version": 1,
+      "description": "Citizen-science radiation measurements from Safecast detectors, worldwide but densest in Japan, the US and Europe.",
+      "author": "Omniscope",
+      "category": "hazards",
+      "icon": "warning",
+      "cost": "free",
+      "tags": [
+        "radiation",
+        "science",
+        "citizen science",
+        "hazard"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/safecast/plugin.json",
+      "sha256": "483eb9c78709300458e476efdfa19dcdf6f427fed79b51db978543bc91e88585",
+      "hosts": [
+        "api.safecast.org"
       ]
     },
     {
@@ -353,6 +809,120 @@
       "hosts": []
     },
     {
+      "id": "space_weather",
+      "name": "Space weather (Kp)",
+      "version": 1,
+      "description": "Latest planetary Kp geomagnetic index. Kp 5 or more is a geomagnetic storm; aurora reaches lower latitudes as Kp rises.",
+      "author": "Omniscope",
+      "category": "sky",
+      "icon": "planet",
+      "cost": "free",
+      "tags": [
+        "aurora",
+        "space",
+        "geomagnetic"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/space_weather/plugin.json",
+      "sha256": "e64ac3252c0e70f85d87cf2af55be9315ea62f4d56211c77ab72bdb4ccb01482",
+      "hosts": [
+        "services.swpc.noaa.gov"
+      ]
+    },
+    {
+      "id": "sun_times",
+      "name": "Sunrise & sunset",
+      "version": 1,
+      "description": "Sunrise, sunset, solar noon and twilight times for your location, in your time zone.",
+      "author": "Omniscope",
+      "category": "sky",
+      "icon": "sun",
+      "cost": "free",
+      "tags": [
+        "sun",
+        "daylight",
+        "twilight"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/sun_times/plugin.json",
+      "sha256": "6a0726198f688374576dad1cfcf4d45fb44222edfc63ef46d2a9fa1eb61629dd",
+      "hosts": [
+        "api.sunrise-sunset.org"
+      ]
+    },
+    {
+      "id": "tide_stations",
+      "name": "Tide stations (NOAA)",
+      "version": 1,
+      "description": "NOAA tide prediction stations on US coasts and territories; nothing inland.",
+      "author": "Omniscope",
+      "category": "nature",
+      "icon": "wind",
+      "cost": "free",
+      "tags": [
+        "tide",
+        "ocean",
+        "coast",
+        "water"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/tide_stations/plugin.json",
+      "sha256": "2b13d1b82954db139f88ae6990a028d382a8daba2e7ebbb2bcdf398f75acfe3b",
+      "hosts": [
+        "api.tidesandcurrents.noaa.gov",
+        "tidesandcurrents.noaa.gov"
+      ]
+    },
+    {
+      "id": "us_census_area",
+      "name": "Census area (US)",
+      "version": 1,
+      "description": "The county, census tract, congressional and legislative districts you are in; United States only.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "map-pin",
+      "cost": "free",
+      "tags": [
+        "census",
+        "politics",
+        "us"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/us_census_area/plugin.json",
+      "sha256": "08067a1c5d9fcdff4ed08f68f90223d5783e0809337777d6ec5f4769fc34eb60",
+      "hosts": [
+        "geocoding.geo.census.gov"
+      ]
+    },
+    {
+      "id": "usgs_water",
+      "name": "Stream gauges (USGS)",
+      "version": 1,
+      "description": "Live river flow and water level readings from USGS stream gauges; US only.",
+      "author": "Omniscope",
+      "category": "hazards",
+      "icon": "warning",
+      "cost": "free",
+      "tags": [
+        "water",
+        "river",
+        "flood",
+        "hazard",
+        "live"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/usgs_water/plugin.json",
+      "sha256": "d4f6851e17315a608b13eefbf8d3e80bf53b61c5ba4c2f4aa16792b3cad726fe",
+      "hosts": [
+        "waterservices.usgs.gov"
+      ]
+    },
+    {
       "id": "weather",
       "name": "Weather",
       "version": 1,
@@ -391,6 +961,28 @@
       ]
     },
     {
+      "id": "wikidata_landmarks",
+      "name": "Notable places (Wikidata)",
+      "version": 1,
+      "description": "Heritage sites, monuments, buildings, museums and other notable things with coordinates near you.",
+      "author": "Omniscope",
+      "category": "history",
+      "icon": "book-open",
+      "cost": "free",
+      "tags": [
+        "history",
+        "culture",
+        "landmarks"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/wikidata_landmarks/plugin.json",
+      "sha256": "ecfa769a9405621a313d734fb4d6767691defc0e0f14579bdcaab468a7b6f565",
+      "hosts": [
+        "query.wikidata.org"
+      ]
+    },
+    {
       "id": "wikipedia",
       "name": "Wikipedia",
       "version": 1,
@@ -408,6 +1000,28 @@
       "sha256": "27c18eea145e472a32932037e2ae0c3633dfc060d354fd3bda01a638c6acfad4",
       "hosts": [
         "en.wikipedia.org"
+      ]
+    },
+    {
+      "id": "wikivoyage",
+      "name": "Travel guides",
+      "version": 1,
+      "description": "Wikivoyage travel-guide articles about places near you.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "map-trifold",
+      "cost": "free",
+      "tags": [
+        "travel",
+        "guide",
+        "culture"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/wikivoyage/plugin.json",
+      "sha256": "0607f3d99eebdf133e45c4cdf2237cead62081313bbf5a197a9ba48a0216bb47",
+      "hosts": [
+        "en.wikivoyage.org"
       ]
     }
   ]

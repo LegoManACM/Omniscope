@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "usgs_water",
+  "version": 1,
+  "name": "Stream gauges (USGS)",
+  "description": "Live river flow and water level readings from USGS stream gauges; US only.",
+  "author": "Omniscope",
+  "source": "USGS National Water Information System",
+  "category": "hazards",
+  "icon": "warning",
+  "cost": "free",
+  "preload": false,
+  "freshness": "slow",
+  "tags": ["water", "river", "flood", "hazard", "live"],
+  "radius": {
+    "default": 15000,
+    "min": 2000,
+    "max": 50000
+  },
+  "hosts": ["waterservices.usgs.gov"],
+  "request": {
+    "url": "https://waterservices.usgs.gov/nwis/iv/?format=json&bBox={west},{south},{east},{north}&parameterCd=00060,00065&siteStatus=active"
+  },
+  "items": "$.value.timeSeries[*]",
+  "item": {
+    "id": "$.name",
+    "title": "$.sourceInfo.siteName | cap || 'Stream gauge'",
+    "subtitle": "{$.values[0].value[-1].value | num | thousands} {$.variable.unit.unitCode} · {$.variable.variableDescription}",
+    "lat": "$.sourceInfo.geoLocation.geogLocation.latitude",
+    "lon": "$.sourceInfo.geoLocation.geogLocation.longitude",
+    "fields": [
+      ["Reading", "{$.values[0].value[-1].value | num | thousands} {$.variable.unit.unitCode}"],
+      ["Measures", "$.variable.variableDescription"],
+      ["Measured", "$.values[0].value[-1].dateTime | date"],
+      ["Site number", "$.sourceInfo.siteCode[0].value"],
+      ["Data quality", "$.values[0].value[-1].qualifiers[0]"]
+    ],
+    "links": [
+      ["USGS site page", "https://waterdata.usgs.gov/monitoring-location/{$.sourceInfo.siteCode[0].value}/"]
+    ]
+  }
+}

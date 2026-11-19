@@ -1,0 +1,38 @@
+{
+  "format": 1,
+  "id": "sun_times",
+  "version": 1,
+  "name": "Sunrise & sunset",
+  "description": "Sunrise, sunset, solar noon and twilight times for your location, in your time zone.",
+  "author": "Omniscope",
+  "source": "sunrise-sunset.org",
+  "category": "sky",
+  "icon": "sun",
+  "cost": "free",
+  "freshness": "static",
+  "preload": false,
+  "tags": ["sun", "daylight", "twilight"],
+  "ambient": true,
+  "hosts": ["api.sunrise-sunset.org"],
+  "request": {
+    "url": "https://api.sunrise-sunset.org/json?lat={lat}&lng={lon}&formatted=0"
+  },
+  "items": "$.results",
+  "item": {
+    "id": "'today'",
+    "title": "Sunrise {$.sunrise | localtime} · Sunset {$.sunset | localtime}",
+    "subtitle": "$.day_length | div:3600 | round1 | suffix: h of daylight",
+    "fields": [
+      ["Sunrise", "$.sunrise | localtime"],
+      ["Solar noon", "$.solar_noon | localtime"],
+      ["Sunset", "$.sunset | localtime"],
+      ["Day length", "$.day_length | div:3600 | round1 | suffix: h"],
+      ["Civil dawn", "$.civil_twilight_begin | localtime"],
+      ["Civil dusk", "$.civil_twilight_end | localtime"],
+      ["Nautical dawn", "$.nautical_twilight_begin | localtime"],
+      ["Nautical dusk", "$.nautical_twilight_end | localtime"],
+      ["Astronomical dawn", "$.astronomical_twilight_begin | localtime"],
+      ["Astronomical dusk", "$.astronomical_twilight_end | localtime"]
+    ]
+  }
+}

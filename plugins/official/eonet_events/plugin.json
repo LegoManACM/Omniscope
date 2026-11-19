@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "eonet_events",
+  "version": 1,
+  "name": "Natural events (NASA EONET)",
+  "description": "Open wildfires, storms, volcanoes, floods and other natural events tracked by NASA, worldwide.",
+  "author": "Omniscope",
+  "source": "NASA EONET",
+  "category": "hazards",
+  "icon": "warning",
+  "cost": "free",
+  "preload": false,
+  "freshness": "slow",
+  "tags": ["hazard", "wildfire", "storm", "volcano", "flood", "nasa"],
+  "radius": {
+    "default": 500000,
+    "min": 50000,
+    "max": 3000000
+  },
+  "hosts": ["eonet.gsfc.nasa.gov"],
+  "request": {
+    "url": "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&bbox={west},{north},{east},{south}"
+  },
+  "items": "$.events[*]",
+  "item": {
+    "id": "$.id",
+    "title": "$.title || 'Natural event'",
+    "subtitle": "{$.categories[0].title} · {$.geometry[-1].date | date}",
+    "lat": "$.geometry[-1].coordinates[1]",
+    "lon": "$.geometry[-1].coordinates[0]",
+    "fields": [
+      ["Category", "$.categories[0].title"],
+      ["Latest report", "$.geometry[-1].date | date"],
+      ["Size", "{$.geometry[-1].magnitudeValue | num | thousands} {$.geometry[-1].magnitudeUnit}"],
+      ["Description", "$.description"]
+    ],
+    "links": [
+      ["EONET event", "$.link"],
+      ["Source report", "$.sources[0].url"]
+    ]
+  }
+}

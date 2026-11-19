@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "fossils",
+  "version": 1,
+  "name": "Fossil finds (PBDB)",
+  "description": "Fossil occurrences recorded in the Paleobiology Database, with their geological age; worldwide, up to 200 per search.",
+  "author": "Omniscope",
+  "source": "Paleobiology Database",
+  "category": "terrain",
+  "icon": "mountains",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["fossil", "paleontology", "geology", "science", "history"],
+  "radius": {
+    "default": 20000,
+    "min": 1000,
+    "max": 200000
+  },
+  "hosts": ["paleobiodb.org"],
+  "request": {
+    "url": "https://paleobiodb.org/data1.2/occs/list.json?lngmin={west}&lngmax={east}&latmin={south}&latmax={north}&show=coords,class&vocab=pbdb&limit=200"
+  },
+  "items": "$.records[*]",
+  "item": {
+    "id": "$.occurrence_no",
+    "title": "$.accepted_name || $.identified_name || 'Fossil'",
+    "subtitle": "{$.early_interval} · {$.max_ma | num | round1}-{$.min_ma | num | round1} Ma · {$.phylum}",
+    "lat": "$.lat",
+    "lon": "$.lng",
+    "fields": [
+      ["Identified as", "$.identified_name"],
+      ["Period", "$.early_interval"],
+      ["Oldest", "$.max_ma | num | round1 | suffix: million years ago"],
+      ["Youngest", "$.min_ma | num | round1 | suffix: million years ago"],
+      ["Phylum", "$.phylum"],
+      ["Class", "$.class | replace:NO_CLASS_SPECIFIED=>"],
+      ["Order", "$.order"],
+      ["Family", "$.family"]
+    ],
+    "links": [
+      ["PBDB collection", "https://paleobiodb.org/classic/basicCollectionSearch?collection_no={$.collection_no}"],
+      ["Occurrence data", "https://paleobiodb.org/data1.2/occs/single.json?id=occ:{$.occurrence_no}&show=full"]
+    ]
+  }
+}

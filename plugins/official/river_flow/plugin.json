@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "id": "river_flow",
+  "version": 1,
+  "name": "River flow",
+  "description": "Modelled river discharge at the nearest river to you, with the week's forecast peak.",
+  "author": "Omniscope",
+  "source": "Open-Meteo Flood (GloFAS)",
+  "category": "hazards",
+  "icon": "warning",
+  "cost": "free",
+  "freshness": "slow",
+  "preload": false,
+  "tags": ["water", "flood", "river"],
+  "ambient": true,
+  "hosts": ["flood-api.open-meteo.com"],
+  "request": {
+    "url": "https://flood-api.open-meteo.com/v1/flood?latitude={lat}&longitude={lon}&daily=river_discharge,river_discharge_max&forecast_days=7"
+  },
+  "items": "$",
+  "item": {
+    "id": "'now'",
+    "title": "$.daily.river_discharge[0] | round1 | prefix:'River discharge ' | suffix: m³/s || 'River discharge unavailable'",
+    "subtitle": "$.daily.river_discharge_max[-1] | round1 | prefix:'Max on day 7: ' | suffix: m³/s",
+    "fields": [
+      ["Today", "$.daily.river_discharge[0] | round1 | suffix: m³/s"],
+      ["Today's max", "$.daily.river_discharge_max[0] | round1 | suffix: m³/s"],
+      ["In 3 days", "$.daily.river_discharge[3] | round1 | suffix: m³/s"],
+      ["In 6 days", "$.daily.river_discharge[-1] | round1 | suffix: m³/s"],
+      ["Max on day 7", "$.daily.river_discharge_max[-1] | round1 | suffix: m³/s"]
+    ]
+  }
+}

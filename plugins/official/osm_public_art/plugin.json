@@ -1,0 +1,44 @@
+{
+  "format": 1,
+  "id": "osm_public_art",
+  "version": 1,
+  "name": "Public art",
+  "description": "Murals, sculptures, statues and other public artworks.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "history",
+  "icon": "image",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["art", "mural", "sculpture", "history"],
+  "radius": {
+    "default": 2000,
+    "min": 100,
+    "max": 10000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[tourism=artwork];);out center tags 300;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name || $.tags.artwork_type | cap || 'Artwork'",
+    "subtitle": "{$.tags.artwork_type | cap} \u00b7 {$.tags.artist_name}",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "fields": [
+      ["Artist", "$.tags.artist_name"],
+      ["Type", "$.tags.artwork_type | cap"],
+      ["Material", "$.tags.material"],
+      ["Date", "$.tags.start_date"],
+      ["Description", "$.tags.description | take:200"]
+    ],
+    "links": [
+      ["Website", "$.tags.website | url || $.tags['contact:website'] | url"],
+      ["Wikipedia", "$.tags.wikipedia | wikiurl"],
+      ["Wikidata", "https://www.wikidata.org/wiki/{$.tags.wikidata}"],
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"]
+    ]
+  }
+}

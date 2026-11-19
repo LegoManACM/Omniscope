@@ -65,6 +65,7 @@ Once it's merged, anyone can install it from **Settings → Get plugins** in the
 | `request` | yes | See below. |
 | `error` | | A path that, if it has a value, is shown as the plugin's error (e.g. `"$.error"`). |
 | `items` | | A path to the list of results (default `$`, the whole response as one item). |
+| `limit` | | Keep at most this many results, nearest first (default 300). |
 | `item` | yes | How to read each result (below). |
 
 ### `request`
@@ -113,6 +114,7 @@ Every value in `item` is an expression evaluated against one result:
 | Fallback | `$.name || $.title || 'Unnamed'` | The first alternative with a value. `'text'` is a literal. |
 | Pipes | `$.alt_baro | num | mul:0.3048 | round` | Transform the value, left to right. |
 | Template | `Magnitude {$.mag | round1} · {$.place}` | Text with expressions in `{…}`. Empty " · " parts are dropped. |
+| Your position | `https://example.org/map/{@lat}/{@lon}` | `{@lat}` and `{@lon}` are the user's coordinates (useful in links). |
 
 Pipes:
 

@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "geology",
+  "version": 1,
+  "name": "Bedrock geology",
+  "description": "The rock units mapped under your feet, with lithology and age.",
+  "author": "Omniscope",
+  "source": "Macrostrat (CC-BY 4.0)",
+  "category": "terrain",
+  "icon": "mountains",
+  "cost": "free",
+  "freshness": "static",
+  "preload": false,
+  "tags": ["geology", "rock", "terrain"],
+  "ambient": true,
+  "hosts": ["macrostrat.org"],
+  "request": {
+    "url": "https://macrostrat.org/api/v2/geologic_units/map?lat={lat}&lng={lon}"
+  },
+  "items": "$.success.data[*]",
+  "item": {
+    "id": "$.map_id",
+    "title": "$.name || $.strat_name || $.lith || 'Geologic unit'",
+    "subtitle": "$.lith",
+    "fields": [
+      ["Lithology", "$.lith"],
+      ["Formation", "$.strat_name"],
+      ["Age", "{$.b_int_name} to {$.t_int_name}"],
+      ["Oldest", "$.b_age | round1 | suffix: Ma"],
+      ["Youngest", "$.t_age | round1 | suffix: Ma"],
+      ["Era", "$.best_int_name"],
+      ["Description", "$.descrip"],
+      ["Notes", "$.comments"]
+    ],
+    "links": [
+      ["Macrostrat map", "https://macrostrat.org/map/loc/{@lon}/{@lat}"]
+    ]
+  }
+}

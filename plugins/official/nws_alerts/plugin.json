@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "nws_alerts",
+  "version": 1,
+  "name": "Weather alerts (US)",
+  "description": "Active US National Weather Service watches, warnings and advisories for your location. US only; no cards when nothing is active.",
+  "author": "Omniscope",
+  "source": "US National Weather Service",
+  "category": "hazards",
+  "icon": "warning",
+  "cost": "free",
+  "freshness": "slow",
+  "preload": false,
+  "tags": ["weather", "hazard", "alerts", "us"],
+  "ambient": true,
+  "hosts": ["api.weather.gov"],
+  "request": {
+    "url": "https://api.weather.gov/alerts/active?point={lat},{lon}"
+  },
+  "items": "$.features[*]",
+  "item": {
+    "id": "$.id || $.properties.id",
+    "title": "$.properties.event || 'Weather alert'",
+    "subtitle": "$.properties.headline",
+    "fields": [
+      ["Severity", "$.properties.severity"],
+      ["Urgency", "$.properties.urgency"],
+      ["Certainty", "$.properties.certainty"],
+      ["Area", "$.properties.areaDesc"],
+      ["Effective", "$.properties.effective | date"],
+      ["Expires", "$.properties.expires | date"],
+      ["Expires at", "$.properties.expires | localtime"],
+      ["Details", "$.properties.description"],
+      ["What to do", "$.properties.instruction"]
+    ],
+    "links": [
+      ["NWS alert", "$.id"]
+    ]
+  }
+}

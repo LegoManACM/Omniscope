@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "osm_viewpoints",
+  "version": 1,
+  "name": "Viewpoints and waterfalls",
+  "description": "Scenic viewpoints and waterfalls.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "terrain",
+  "icon": "eye",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["viewpoint", "waterfall", "scenic", "terrain"],
+  "radius": {
+    "default": 10000,
+    "min": 500,
+    "max": 50000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[tourism=viewpoint];nwr(around:{radius_m},{lat},{lon})[waterway=waterfall];);out center tags 300;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name || $.tags.waterway | replace:waterfall=>Waterfall || 'Viewpoint'",
+    "subtitle": "$.tags.waterway | replace:waterfall=>Waterfall || $.tags.tourism | replace:viewpoint=>Viewpoint",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "altM": "$.tags.ele | num",
+    "fields": [
+      ["Elevation", "$.tags.ele | num | round | suffix: m"],
+      ["Waterfall height", "$.tags.height | num | suffix: m"],
+      ["Direction", "$.tags.direction"]
+    ],
+    "links": [
+      ["Website", "$.tags.website | url || $.tags['contact:website'] | url"],
+      ["Wikipedia", "$.tags.wikipedia | wikiurl"],
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"]
+    ]
+  }
+}

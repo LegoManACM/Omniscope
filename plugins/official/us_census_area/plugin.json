@@ -1,0 +1,37 @@
+{
+  "format": 1,
+  "id": "us_census_area",
+  "version": 1,
+  "name": "Census area (US)",
+  "description": "The county, census tract, congressional and legislative districts you are in; United States only.",
+  "author": "Omniscope",
+  "source": "US Census Bureau Geocoder",
+  "category": "places",
+  "icon": "map-pin",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["census", "politics", "us"],
+  "ambient": true,
+  "hosts": ["geocoding.geo.census.gov"],
+  "request": {
+    "url": "https://geocoding.geo.census.gov/geocoder/geographies/coordinates?x={lon}&y={lat}&benchmark=Public_AR_Current&vintage=Current_Current&format=json"
+  },
+  "error": "$.errors[0]",
+  "items": "$",
+  "item": {
+    "id": "'census'",
+    "title": "$.result.geographies.Counties[0].NAME || $.result.geographies.States[0].NAME || 'Outside the US'",
+    "subtitle": "$.result.geographies.States[0].NAME",
+    "fields": [
+      ["State", "$.result.geographies.States[0].NAME"],
+      ["County", "$.result.geographies.Counties[0].NAME"],
+      ["City", "$.result.geographies['Incorporated Places'][0].NAME"],
+      ["Census tract", "$.result.geographies['Census Tracts'][0].NAME"],
+      ["Block group", "$.result.geographies['2020 Census Blocks'][0].BLKGRP"],
+      ["Congressional district", "$.result.geographies['120th Congressional Districts'][0].NAME || $.result.geographies['119th Congressional Districts'][0].NAME"],
+      ["State senate district", "$.result.geographies['2026 State Legislative Districts - Upper'][0].NAME || $.result.geographies['2024 State Legislative Districts - Upper'][0].NAME"],
+      ["State house district", "$.result.geographies['2026 State Legislative Districts - Lower'][0].NAME || $.result.geographies['2024 State Legislative Districts - Lower'][0].NAME"]
+    ]
+  }
+}

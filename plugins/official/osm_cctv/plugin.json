@@ -1,0 +1,44 @@
+{
+  "format": 1,
+  "id": "osm_cctv",
+  "version": 1,
+  "name": "Surveillance cameras",
+  "description": "CCTV and surveillance cameras mapped in OpenStreetMap, excluding licence plate readers.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "surveillance",
+  "icon": "eye",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["cctv", "camera", "surveillance"],
+  "radius": {
+    "default": 500,
+    "min": 50,
+    "max": 3000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[man_made=surveillance][\"surveillance:type\"!~\"^(ALPR|ANPR|alpr|anpr)$\"];);out center tags 400;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name || $.tags.operator || 'Surveillance camera'",
+    "subtitle": "{$.tags.surveillance | cap} \u00b7 {$.tags['camera:type']} \u00b7 {$.tags.operator}",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "heightM": "$.tags.height | num",
+    "fields": [
+      ["Camera type", "$.tags['camera:type']"],
+      ["Direction", "$.tags['camera:direction'] || $.tags.direction"],
+      ["Area", "$.tags.surveillance"],
+      ["Kind", "$.tags['surveillance:type']"],
+      ["Operator", "$.tags.operator"],
+      ["Height", "$.tags.height | num | suffix: m"],
+      ["Mount", "$.tags['camera:mount']"]
+    ],
+    "links": [
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"]
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "format": 1,
+  "id": "opensky",
+  "version": 1,
+  "name": "Aircraft (OpenSky)",
+  "description": "Live aircraft positions from the OpenSky Network; anonymous access is limited to about 400 requests a day, so use it sparingly.",
+  "author": "Omniscope",
+  "source": "OpenSky Network",
+  "category": "transport",
+  "icon": "airplane-tilt",
+  "cost": "free",
+  "preload": false,
+  "dailyLimit": 300,
+  "freshness": "live",
+  "tags": ["sky", "transport", "live", "aircraft"],
+  "radius": {
+    "default": 75000,
+    "min": 5000,
+    "max": 200000
+  },
+  "hosts": ["opensky-network.org"],
+  "request": {
+    "url": "https://opensky-network.org/api/states/all?lamin={south}&lomin={west}&lamax={north}&lomax={east}"
+  },
+  "items": "$.states[*]",
+  "item": {
+    "id": "$[0]",
+    "title": "$[1] | trim || $[0] | upper",
+    "subtitle": "{$[2]} · {$[13] | thousands | suffix: m || $[7] | thousands | suffix: m || 'on the ground'} · {$[9] | mul:1.944 | round | suffix: kt}",
+    "lat": "$[6]",
+    "lon": "$[5]",
+    "altM": "$[13] || $[7]",
+    "fields": [
+      ["ICAO24", "$[0] | upper"],
+      ["Country", "$[2]"],
+      ["Ground speed", "$[9] | mul:1.944 | round | suffix: kt"],
+      ["Track", "$[10] | round | suffix:°"],
+      ["Heading", "$[10] | compass"]
+    ],
+    "links": [
+      ["OpenSky aircraft", "https://opensky-network.org/aircraft-profile?icao24={$[0]}"]
+    ]
+  }
+}

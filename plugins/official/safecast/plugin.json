@@ -1,0 +1,41 @@
+{
+  "format": 1,
+  "id": "safecast",
+  "version": 1,
+  "name": "Radiation readings (Safecast)",
+  "description": "Citizen-science radiation measurements from Safecast detectors, worldwide but densest in Japan, the US and Europe.",
+  "author": "Omniscope",
+  "source": "Safecast",
+  "category": "hazards",
+  "icon": "warning",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["radiation", "science", "citizen science", "hazard"],
+  "radius": {
+    "default": 20000,
+    "min": 500,
+    "max": 200000
+  },
+  "hosts": ["api.safecast.org"],
+  "request": {
+    "url": "https://api.safecast.org/measurements.json?latitude={lat}&longitude={lon}&distance={radius_m}"
+  },
+  "items": "$[*]",
+  "item": {
+    "id": "$.id",
+    "title": "{$.value} {$.unit}",
+    "subtitle": "{$.location_name} · {$.captured_at | date}",
+    "lat": "$.latitude",
+    "lon": "$.longitude",
+    "fields": [
+      ["Reading", "{$.value} {$.unit}"],
+      ["Captured", "$.captured_at | date"],
+      ["Device", "$.device_id"],
+      ["Location", "$.location_name"]
+    ],
+    "links": [
+      ["Safecast measurement", "https://api.safecast.org/measurements/{$.id}"]
+    ]
+  }
+}

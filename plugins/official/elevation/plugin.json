@@ -1,0 +1,30 @@
+{
+  "format": 1,
+  "id": "elevation",
+  "version": 1,
+  "name": "Ground elevation",
+  "description": "Height of the ground above sea level at your location.",
+  "author": "Omniscope",
+  "source": "Open-Meteo (Copernicus DEM)",
+  "category": "terrain",
+  "icon": "mountains",
+  "cost": "free",
+  "freshness": "static",
+  "preload": false,
+  "tags": ["terrain", "altitude"],
+  "ambient": true,
+  "hosts": ["api.open-meteo.com"],
+  "request": {
+    "url": "https://api.open-meteo.com/v1/elevation?latitude={lat}&longitude={lon}"
+  },
+  "items": "$",
+  "item": {
+    "id": "'here'",
+    "title": "$.elevation[0] | round | thousands | prefix:'Elevation ' | suffix: m || 'Elevation unknown'",
+    "subtitle": "$.elevation[0] | mul:3.28084 | round | thousands | suffix: ft above sea level",
+    "fields": [
+      ["Metres", "$.elevation[0] | round | thousands | suffix: m"],
+      ["Feet", "$.elevation[0] | mul:3.28084 | round | thousands | suffix: ft"]
+    ]
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "wikidata_landmarks",
+  "version": 1,
+  "name": "Notable places (Wikidata)",
+  "description": "Heritage sites, monuments, buildings, museums and other notable things with coordinates near you.",
+  "author": "Omniscope",
+  "source": "Wikidata Query Service",
+  "category": "history",
+  "icon": "book-open",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["history", "culture", "landmarks"],
+  "radius": {
+    "default": 3000,
+    "min": 100,
+    "max": 10000
+  },
+  "hosts": ["query.wikidata.org"],
+  "request": {
+    "url": "https://query.wikidata.org/sparql?format=json&query=SELECT%20%3Fitem%20%3FitemLabel%20%3FitemDescription%20%3Fcoord%20%3Fimage%20WHERE%20%7B%20SERVICE%20wikibase:around%20%7B%20%3Fitem%20wdt:P625%20%3Fcoord%20.%20bd:serviceParam%20wikibase:center%20%22Point%28{lon}%20{lat}%29%22%5E%5Egeo:wktLiteral%20.%20bd:serviceParam%20wikibase:radius%20%22{radius_km:2}%22%20.%20%7D%20OPTIONAL%20%7B%20%3Fitem%20wdt:P18%20%3Fimage%20.%20%7D%20SERVICE%20wikibase:label%20%7B%20bd:serviceParam%20wikibase:language%20%22en%22%20.%20%7D%20%7D%20LIMIT%20100"
+  },
+  "items": "$.results.bindings[*]",
+  "item": {
+    "id": "$.item.value",
+    "title": "$.itemLabel.value || 'Wikidata item'",
+    "subtitle": "$.itemDescription.value | cap | take:160",
+    "lat": "$.coord.value | wktlat",
+    "lon": "$.coord.value | wktlon",
+    "image": "$.image.value | replace:http://=>https://",
+    "fields": [
+      ["Description", "$.itemDescription.value | cap"]
+    ],
+    "links": [
+      ["Wikidata", "https://www.wikidata.org/wiki/{$.item.value | removeprefix:http://www.wikidata.org/entity/}"]
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "format": 1,
+  "id": "panoramax",
+  "version": 1,
+  "name": "Street-level photos",
+  "description": "Open street-level photos from Panoramax near you (coverage varies, strongest in France and Europe).",
+  "author": "Omniscope",
+  "source": "Panoramax",
+  "category": "media",
+  "icon": "camera",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["street", "photos", "openstreetmap"],
+  "radius": {
+    "default": 500,
+    "min": 50,
+    "max": 3000
+  },
+  "hosts": ["api.panoramax.xyz"],
+  "request": {
+    "url": "https://api.panoramax.xyz/api/search?bbox={west},{south},{east},{north}&limit=50"
+  },
+  "items": "$.features[*]",
+  "item": {
+    "id": "$.id",
+    "title": "Street photo {$.properties.datetime | date}",
+    "subtitle": "$.properties['pers:interior_orientation'].camera_model",
+    "lat": "$.geometry.coordinates[1]",
+    "lon": "$.geometry.coordinates[0]",
+    "image": "$.assets.thumb.href || $.assets.sd.href",
+    "fields": [
+      ["Taken", "$.properties.datetime | date"],
+      ["Camera", "$.properties['pers:interior_orientation'].camera_model"],
+      ["Direction", "$.properties['view:azimuth'] | compass"],
+      ["License", "$.properties.license"]
+    ],
+    "links": [
+      ["Panoramax viewer", "https://api.panoramax.xyz/#focus=pic&pic={$.id}"],
+      ["Full-size photo", "$.assets.sd.href"]
+    ]
+  }
+}

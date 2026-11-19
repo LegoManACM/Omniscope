@@ -1,0 +1,39 @@
+{
+  "format": 1,
+  "id": "wikivoyage",
+  "version": 1,
+  "name": "Travel guides",
+  "description": "Wikivoyage travel-guide articles about places near you.",
+  "author": "Omniscope",
+  "source": "Wikivoyage GeoSearch",
+  "category": "places",
+  "icon": "map-trifold",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["travel", "guide", "culture"],
+  "radius": {
+    "default": 10000,
+    "min": 50,
+    "max": 10000
+  },
+  "hosts": ["en.wikivoyage.org"],
+  "request": {
+    "url": "https://en.wikivoyage.org/w/api.php?action=query&generator=geosearch&ggscoord={lat}%7C{lon}&ggsradius={radius_m}&ggslimit=20&prop=coordinates%7Cpageimages%7Cextracts&exintro=1&explaintext=1&exsentences=3&exlimit=20&pithumbsize=640&pilimit=20&colimit=20&format=json"
+  },
+  "items": "$.query.pages.*",
+  "item": {
+    "id": "$.pageid",
+    "title": "$.title",
+    "subtitle": "$.extract | take:160",
+    "lat": "$.coordinates[0].lat",
+    "lon": "$.coordinates[0].lon",
+    "image": "$.thumbnail.source",
+    "fields": [
+      ["Summary", "$.extract"]
+    ],
+    "links": [
+      ["Wikivoyage", "https://en.wikivoyage.org/?curid={$.pageid}"]
+    ]
+  }
+}

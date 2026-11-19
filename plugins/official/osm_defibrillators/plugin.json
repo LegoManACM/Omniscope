@@ -1,0 +1,41 @@
+{
+  "format": 1,
+  "id": "osm_defibrillators",
+  "version": 1,
+  "name": "Defibrillators (AED)",
+  "description": "Public automated external defibrillators.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "places",
+  "icon": "info",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["aed", "emergency", "health"],
+  "radius": {
+    "default": 2000,
+    "min": 100,
+    "max": 10000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[emergency=defibrillator];);out center tags 300;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name || 'Defibrillator (AED)'",
+    "subtitle": "$.tags['defibrillator:location'] | take:60 || $.tags.indoor | replace:yes=>Indoors",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "fields": [
+      ["Location", "$.tags['defibrillator:location']"],
+      ["Indoor", "$.tags.indoor"],
+      ["Access", "$.tags.access"],
+      ["Opening hours", "$.tags.opening_hours"],
+      ["Operator", "$.tags.operator"]
+    ],
+    "links": [
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"]
+    ]
+  }
+}

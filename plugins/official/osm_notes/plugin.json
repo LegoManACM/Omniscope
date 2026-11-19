@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "osm_notes",
+  "version": 1,
+  "name": "Open map notes",
+  "description": "Unresolved OpenStreetMap notes (community map bug reports) near you.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap Notes API",
+  "category": "places",
+  "icon": "info",
+  "cost": "free",
+  "preload": false,
+  "freshness": "slow",
+  "tags": ["osm", "map", "community"],
+  "radius": {
+    "default": 2000,
+    "min": 100,
+    "max": 20000
+  },
+  "hosts": ["api.openstreetmap.org"],
+  "request": {
+    "url": "https://api.openstreetmap.org/api/0.6/notes.json?bbox={west},{south},{east},{north}&limit=100&closed=0"
+  },
+  "items": "$.features[*]",
+  "item": {
+    "id": "$.properties.id",
+    "title": "$.properties.comments[0].text | take:80 || 'Map note'",
+    "subtitle": "Opened {$.properties.date_created | date}",
+    "lat": "$.geometry.coordinates[1]",
+    "lon": "$.geometry.coordinates[0]",
+    "fields": [
+      ["Note", "$.properties.comments[0].text"],
+      ["Opened", "$.properties.date_created | date"],
+      ["Comments", "$.properties.comments | count"]
+    ],
+    "links": [
+      ["OpenStreetMap note", "https://www.openstreetmap.org/note/{$.properties.id}"]
+    ]
+  }
+}

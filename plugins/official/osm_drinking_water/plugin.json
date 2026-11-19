@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "osm_drinking_water",
+  "version": 1,
+  "name": "Drinking water",
+  "description": "Drinking water taps and fountains.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "places",
+  "icon": "map-pin",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["water", "places"],
+  "radius": {
+    "default": 1000,
+    "min": 50,
+    "max": 5000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[amenity=drinking_water];);out center tags 300;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name || 'Drinking water'",
+    "subtitle": "$.tags.bottle | replace:yes=>Bottle refill || $.tags.fountain | cap || 'Drinking water'",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "fields": [
+      ["Access", "$.tags.access"],
+      ["Bottle refill", "$.tags.bottle"],
+      ["Fountain type", "$.tags.fountain"],
+      ["Seasonal", "$.tags.seasonal"],
+      ["Wheelchair", "$.tags.wheelchair"],
+      ["Operator", "$.tags.operator"]
+    ],
+    "links": [
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"]
+    ]
+  }
+}

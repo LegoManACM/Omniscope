@@ -1,0 +1,40 @@
+{
+  "format": 1,
+  "id": "osm_speed_cameras",
+  "version": 1,
+  "name": "Speed cameras",
+  "description": "Speed and red-light enforcement cameras.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "surveillance",
+  "icon": "warning",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["speed camera", "red light", "enforcement", "traffic"],
+  "radius": {
+    "default": 10000,
+    "min": 500,
+    "max": 50000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[highway=speed_camera];node(around:{radius_m},{lat},{lon})[enforcement~\"^(maxspeed|traffic_signals|red_light)$\"];);out center tags 300;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name || 'Speed camera'",
+    "subtitle": "$.tags.maxspeed | suffix:' limit' || $.tags.enforcement | replace:'_=> ' | cap",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "fields": [
+      ["Speed limit", "$.tags.maxspeed"],
+      ["Enforcement", "$.tags.enforcement | replace:'_=> ' | cap"],
+      ["Direction", "$.tags.direction"],
+      ["Operator", "$.tags.operator"]
+    ],
+    "links": [
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"]
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "space_weather",
+  "version": 1,
+  "name": "Space weather (Kp)",
+  "description": "Latest planetary Kp geomagnetic index. Kp 5 or more is a geomagnetic storm; aurora reaches lower latitudes as Kp rises.",
+  "author": "Omniscope",
+  "source": "NOAA SWPC",
+  "category": "sky",
+  "icon": "planet",
+  "cost": "free",
+  "freshness": "slow",
+  "preload": false,
+  "tags": ["aurora", "space", "geomagnetic"],
+  "ambient": true,
+  "hosts": ["services.swpc.noaa.gov"],
+  "request": {
+    "url": "https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json"
+  },
+  "items": "$[-1]",
+  "item": {
+    "id": "'kp'",
+    "title": "$.Kp | num | round1 | prefix:'Kp ' || 'Kp unavailable'",
+    "subtitle": "Kp 5 or more is a geomagnetic storm; aurora may be visible far from the poles",
+    "fields": [
+      ["Kp index", "$.Kp | num | round1"],
+      ["Measured", "$.time_tag | date"],
+      ["Time (local)", "$.time_tag | localtime"],
+      ["Stations", "$.station_count"]
+    ],
+    "links": [
+      ["Aurora forecast", "https://www.swpc.noaa.gov/products/aurora-30-minute-forecast"]
+    ]
+  }
+}

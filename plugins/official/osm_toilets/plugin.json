@@ -1,0 +1,42 @@
+{
+  "format": 1,
+  "id": "osm_toilets",
+  "version": 1,
+  "name": "Public toilets",
+  "description": "Public toilets, with access, fees and accessibility.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "places",
+  "icon": "map-pin",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["toilets", "places"],
+  "radius": {
+    "default": 1500,
+    "min": 50,
+    "max": 5000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[amenity=toilets];);out center tags 300;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name || 'Public toilets'",
+    "subtitle": "$.tags.fee | replace:yes=>Fee || $.tags.access",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "fields": [
+      ["Access", "$.tags.access"],
+      ["Fee", "$.tags.fee"],
+      ["Wheelchair", "$.tags.wheelchair"],
+      ["Opening hours", "$.tags.opening_hours"],
+      ["Operator", "$.tags.operator"]
+    ],
+    "links": [
+      ["Website", "$.tags.website | url || $.tags['contact:website'] | url"],
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"]
+    ]
+  }
+}

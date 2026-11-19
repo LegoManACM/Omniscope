@@ -1,0 +1,46 @@
+{
+  "format": 1,
+  "id": "osm_ev_charging",
+  "version": 1,
+  "name": "EV charging",
+  "description": "Electric vehicle charging stations and their connectors.",
+  "author": "Omniscope",
+  "source": "OpenStreetMap via Overpass",
+  "category": "transport",
+  "icon": "navigation-arrow",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["ev", "charging", "transport"],
+  "radius": {
+    "default": 10000,
+    "min": 500,
+    "max": 50000
+  },
+  "request": {
+    "overpass": "[out:json][timeout:25];(nwr(around:{radius_m},{lat},{lon})[amenity=charging_station];);out center tags 300;"
+  },
+  "items": "$.elements[*]",
+  "item": {
+    "id": "{$.type}{$.id}",
+    "title": "$.tags.name || $.tags.operator || $.tags.brand || 'EV charging'",
+    "subtitle": "{$.tags.operator || $.tags.brand} \u00b7 {$.tags.capacity | suffix:' chargers'}",
+    "lat": "$.lat || $.center.lat",
+    "lon": "$.lon || $.center.lon",
+    "fields": [
+      ["Operator", "$.tags.operator || $.tags.brand"],
+      ["Capacity", "$.tags.capacity"],
+      ["Type 2", "$.tags['socket:type2']"],
+      ["CCS", "$.tags['socket:type2_combo'] || $.tags['socket:ccs']"],
+      ["CHAdeMO", "$.tags['socket:chademo']"],
+      ["Tesla / NACS", "$.tags['socket:tesla_supercharger'] || $.tags['socket:nacs'] || $.tags['socket:tesla_destination']"],
+      ["Type 1", "$.tags['socket:type1']"],
+      ["Fee", "$.tags.fee"],
+      ["Opening hours", "$.tags.opening_hours"]
+    ],
+    "links": [
+      ["Website", "$.tags.website | url || $.tags['contact:website'] | url"],
+      ["OpenStreetMap", "https://www.openstreetmap.org/{$.type}/{$.id}"]
+    ]
+  }
+}

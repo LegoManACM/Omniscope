@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "id": "police_uk_crime",
+  "version": 1,
+  "name": "Street crime (UK)",
+  "description": "Recorded street-level crimes within about a mile of you, latest published month; England, Wales and Northern Ireland only.",
+  "author": "Omniscope",
+  "source": "data.police.uk",
+  "category": "hazards",
+  "icon": "warning",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["crime", "safety", "uk"],
+  "hosts": ["data.police.uk"],
+  "request": {
+    "url": "https://data.police.uk/api/crimes-street/all-crime?lat={lat}&lng={lon}"
+  },
+  "items": "$[*]",
+  "item": {
+    "id": "$.id",
+    "title": "$.category | replace:'-=> ' | cap || 'Crime'",
+    "subtitle": "{$.location.street.name} · {$.month}",
+    "lat": "$.location.latitude | num",
+    "lon": "$.location.longitude | num",
+    "fields": [
+      ["Outcome", "$.outcome_status.category"],
+      ["Outcome date", "$.outcome_status.date"],
+      ["Street", "$.location.street.name"],
+      ["Month", "$.month"]
+    ]
+  }
+}
