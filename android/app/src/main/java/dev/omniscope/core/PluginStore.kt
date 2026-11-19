@@ -58,7 +58,8 @@ class PluginStore(private val context: Context, private val http: Http) {
         for (id in bundled) {
             val text = runCatching { context.assets.open("plugins/official/$id/plugin.json").bufferedReader().readText() }.getOrNull() ?: continue
             val m = runCatching { Manifest.parse(text) }.getOrNull() ?: continue
-            if (m.id in removed || m.problems().isNotEmpty()) continue
+            // "preload": false official plugins are offered in Get plugins rather than installed for everyone.
+            if (m.id in removed || m.problems().isNotEmpty() || !m.json.optBoolean("preload", true)) continue
             val current = readInstalled(m.id)
             if (current == null || current.manifest.version < m.version) write(m.id, text, "bundled", null, official = true)
         }

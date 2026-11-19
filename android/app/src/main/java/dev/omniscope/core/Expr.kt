@@ -182,6 +182,9 @@ object Expr {
             "suffix" -> s()?.let { it + arg }
             "default" -> v ?: arg
             "date" -> v?.let { toDate(it) }
+            "localtime" -> v?.let { toLocalTime(it) }
+            "wktlat" -> s()?.let { wkt(it)?.second }
+            "wktlon" -> s()?.let { wkt(it)?.first }
             "compass" -> n()?.let { compass[(((it % 360) + 360) % 360 / 45 + 0.5).toInt() % 8] }
             "url" -> s()?.let { if (it.startsWith("http://") || it.startsWith("https://")) it else "https://$it" }
             "wikiurl" -> s()?.let { t ->
@@ -198,6 +201,23 @@ object Expr {
         val ms = when (v) { is Number -> v.toDouble(); is String -> v.trim().takeIf { t -> t.all { it.isDigit() } }?.toDoubleOrNull(); else -> null }
         if (ms != null) return Instant.ofEpochMilli(ms.toLong()).atOffset(ZoneOffset.UTC).toLocalDate().toString()
         return format(v)?.take(10)
+    }
+
+    /** An ISO date-time or epoch milliseconds to HH:mm in the phone's time zone. */
+    private fun toLocalTime(v: Any): String? {
+        val instant = when (v) {
+            is Number -> Instant.ofEpochMilli(v.toLong())
+            is String -> runCatching { java.time.OffsetDateTime.parse(v.trim()).toInstant() }.getOrNull()
+                ?: runCatching { Instant.parse(v.trim()) }.getOrNull()
+            else -> null
+        } ?: return null
+        return java.time.format.DateTimeFormatter.ofPattern("HH:mm").withZone(java.time.ZoneId.systemDefault()).format(instant)
+    }
+
+    /** "Point(lon lat)" (WKT, as Wikidata returns) to (lon, lat). */
+    private fun wkt(t: String): Pair<Double, Double>? {
+        val m = Regex("""Point\(\s*(-?[0-9.]+)\s+(-?[0-9.]+)\s*\)""", RegexOption.IGNORE_CASE).find(t) ?: return null
+        return m.groupValues[1].toDouble() to m.groupValues[2].toDouble()
     }
 
     fun toNumber(v: Any?): Double? = when (v) {
@@ -237,7 +257,8 @@ object Expr {
 
     /**
      * Request templates: `{lat}`, `{lon}`, `{radius_m}`, `{radius_km}` (or `{radius_km:3}` for 3 decimals),
-     * `{radius_nm}`, `{key}`, `{date}` / `{date:-14}` (today plus N days, UTC). Values are URL-safe.
+     * `{radius_nm}`, `{key}`, `{date}` / `{date:-14}` (today plus N days, UTC), and `{south}`, `{west}`, `{north}`,
+     * `{east}` (a box of the search radius around you). Values are URL-safe.
      */
     fun request(t: String, ctx: Ctx, key: String?): String = placeholder.replace(t) { m ->
         val name = m.groupValues[1].substringBefore(':').trim()
@@ -251,6 +272,10 @@ object Expr {
             "radius_nm" -> (ctx.radiusM / 1852).roundToLong().coerceAtLeast(1).toString()
             "key" -> URLEncoder.encode(key.orEmpty(), "UTF-8")
             "date" -> LocalDate.now(ZoneOffset.UTC).plusDays(arg.toLongOrNull() ?: 0).toString()
+            // A box around you of the plugin's search radius, for APIs that take bounds instead of a radius.
+            "south", "north" -> "%.5f".format(java.util.Locale.US, ctx.lat + (if (name == "north") 1 else -1) * ctx.radiusM / 110_540.0)
+            "west", "east" -> "%.5f".format(java.util.Locale.US, ctx.lon + (if (name == "east") 1 else -1) *
+                ctx.radiusM / (111_320.0 * kotlin.math.cos(Math.toRadians(ctx.lat))))
             else -> throw ExprError("Unknown request placeholder {$name}")
         }
     }

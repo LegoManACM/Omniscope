@@ -3,6 +3,7 @@
 
     python tools/build_index.py           # validate and write plugins/index.json
     python tools/build_index.py --check   # validate and fail if index.json is out of date (CI)
+    python tools/build_index.py --validate [id ...]  # only validate (all, or the given ids); writes nothing
 
 The checks mirror the app's (android/.../core/Manifest.kt): a manifest the app would refuse never gets listed.
 """
@@ -26,7 +27,7 @@ ICONS = {"airplane-tilt", "barcode", "binoculars", "book-open", "broadcast", "bu
 COSTS = {"free", "freemium", "paid"}
 FRESHNESS = {"live", "slow", "static"}
 OVERPASS_HOSTS = ["overpass-api.de", "overpass.private.coffee"]
-INDEX_FIELDS = ["id", "name", "version", "description", "author", "category", "icon", "cost", "tags", "native"]
+INDEX_FIELDS = ["id", "name", "version", "description", "author", "category", "icon", "cost", "tags", "native", "preload"]
 
 
 def sha256(text: str) -> str:
@@ -90,11 +91,15 @@ def problems(m: dict, official: bool) -> list:
 
 def main() -> int:
     check = "--check" in sys.argv
+    validate_only = "--validate" in sys.argv
+    only = {a for a in sys.argv[1:] if not a.startswith("--")}
     entries, errors, seen = [], [], {}
     for path in sorted(PLUGINS.glob("*/*/plugin.json")):
         group = path.parent.parent.name
         if group not in ("official", "community"):
             errors.append(f"{path.relative_to(ROOT)}: plugins go in plugins/official/ or plugins/community/")
+            continue
+        if only and path.parent.name not in only:
             continue
         text = path.read_text(encoding="utf-8")
         try:
@@ -119,6 +124,9 @@ def main() -> int:
         print("Plugin problems:\n  " + "\n  ".join(errors))
         return 1
 
+    if validate_only:
+        print(f"OK: {len(entries)} plugin(s) valid.")
+        return 0
     index = json.dumps({"format": 1, "plugins": entries}, indent=2, ensure_ascii=False) + "\n"
     current = INDEX.read_text(encoding="utf-8").replace("\r\n", "\n") if INDEX.exists() else ""
     if check:

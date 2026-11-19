@@ -34,6 +34,9 @@ class ExprTest {
         assertEquals("Bridge", Expr.string("$.pages.12.title | removeprefix:File: | noext", node))
         assertEquals("2023-11-14", Expr.string("$.time | date", node))
         assertEquals("1987-05-01", Expr.string("'1987-05-01T10:00:00' | date", node))
+        assertEquals(-117.5, Expr.number("'Point(-117.5 47.25)' | wktlon", node)!!, 0.0)
+        assertEquals(47.25, Expr.number("'Point(-117.5 47.25)' | wktlat", node)!!, 0.0)
+        assertEquals(5, Expr.string("'2026-11-19T15:04:00+00:00' | localtime", node)!!.length)
         assertEquals("4.0", Expr.string("$.mag | round1", node))
         assertEquals("https://en.wikipedia.org/wiki/Mount_Spokane", Expr.string("$.tags.wikipedia | wikiurl", node))
         assertEquals(listOf("a/medium.jpg", "b/medium.jpg"), Expr.list("$.photos[*].url | replace:square=>medium", node))
@@ -51,5 +54,6 @@ class ExprTest {
         val ctx = Ctx(47.6, -117.4, null, 0L, radiusM = 2500.0)
         assertEquals("lat=47.60000&r=2500&km=3&km3=2.500&nm=1", Expr.request("lat={lat}&r={radius_m}&km={radius_km}&km3={radius_km:3}&nm={radius_nm}", ctx, null))
         assertEquals("k=a%2Bb", Expr.request("k={key}", ctx, "a+b"))
+        assertEquals("47.57738,47.62262", Expr.request("{south},{north}", ctx, null))
     }
 }

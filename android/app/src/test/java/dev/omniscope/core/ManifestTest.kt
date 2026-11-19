@@ -35,9 +35,14 @@ class ManifestTest {
         val http = Http(Files.createTempDirectory("omniscope-test").toFile())
         val report = StringBuilder()
         var failures = 0
-        for ((_, m) in manifests().filter { it.second.native == null && it.second.key == null }) {
+        // OMNISCOPE_PLUGIN=id1,id2 limits the run to those plugins.
+        val only = System.getenv("OMNISCOPE_PLUGIN")?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() }?.toSet()
+        for ((_, m) in manifests().filter { it.second.native == null && it.second.key == null && (only == null || it.second.id in only) }) {
             val p = DeclarativePlugin(m)
-            val ctx = Ctx(47.6588, -117.4260, 600.0, System.currentTimeMillis(), radiusM = m.radius?.defaultM ?: 0.0)
+            // Spokane, WA by default; OMNISCOPE_LAT/OMNISCOPE_LON test elsewhere (e.g. London for UK-only APIs).
+            val lat = System.getenv("OMNISCOPE_LAT")?.toDoubleOrNull() ?: 47.6588
+            val lon = System.getenv("OMNISCOPE_LON")?.toDoubleOrNull() ?: -117.4260
+            val ctx = Ctx(lat, lon, 600.0, System.currentTimeMillis(), radiusM = m.radius?.defaultM ?: 0.0)
             try {
                 val items = runBlocking { p.fetch(ctx, PluginEnv(http, null)) }
                 val first = items.firstOrNull()

@@ -60,6 +60,7 @@ Once it's merged, anyone can install it from **Settings → Get plugins** in the
 | `radius` | | `{"default", "min", "max"}` in metres: the user's search-radius slider. Leave it out if the API has no radius. |
 | `key` | | `{"label", "signup"}` if the API needs a key. The user enters it in the app; use `{key}` in the request. |
 | `dailyLimit` | | Stop calling after this many requests a day (for metered free tiers). |
+| `preload` | | Official plugins only: `false` offers it in Get plugins instead of installing it for everyone. |
 | `hosts` | yes | Every host the plugin may contact. The app refuses to call anything else. |
 | `request` | yes | See below. |
 | `error` | | A path that, if it has a value, is shown as the plugin's error (e.g. `"$.error"`). |
@@ -80,6 +81,8 @@ Once it's merged, anyone can install it from **Settings → Get plugins** in the
   list hosts for it.
 - Placeholders: `{lat}`, `{lon}`, `{radius_m}`, `{radius_km}` (whole km), `{radius_km:3}` (3 decimals), `{radius_nm}`
   (nautical miles), `{key}`, `{date}` (today, UTC, `YYYY-MM-DD`) and `{date:-14}` (14 days ago).
+- For APIs that take a bounding box instead of a radius: `{south}`, `{west}`, `{north}`, `{east}`, a box the size of
+  the search radius around the user (decimal degrees).
 - HTTPS only. The host part of every URL must be written out (not a placeholder) and listed in `hosts`.
 
 ### `item`
@@ -126,6 +129,8 @@ Pipes:
 | `prefix:x`, `suffix:x` | Add text, only when there's a value (`suffix: m`). |
 | `default:x` | A value to use when there isn't one. |
 | `date` | Milliseconds since 1970 or an ISO date to `YYYY-MM-DD`. |
+| `localtime` | An ISO date-time (or milliseconds) to `HH:mm` in the phone's time zone. |
+| `wktlat`, `wktlon` | Latitude or longitude from WKT `Point(lon lat)` text (Wikidata returns these). |
 | `compass` | Degrees to `N`, `NE`, … |
 | `url` | Adds `https://` if a website has no scheme. |
 | `wikiurl` | An OSM `wikipedia=en:Title` tag to an article link. |
