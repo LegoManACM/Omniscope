@@ -63,6 +63,7 @@ fun GetPluginsScreen(app: App) {
     var reload by remember { mutableIntStateOf(0) }
     var query by remember { mutableStateOf("") }
     var category by remember { mutableStateOf<Category?>(null) }
+    var show by remember { mutableStateOf(Show.ALL) }
     val busy = remember { mutableStateMapOf<String, String>() } // id -> "Installing…" or an error
 
     LaunchedEffect(reload, sources) {
@@ -73,7 +74,9 @@ fun GetPluginsScreen(app: App) {
 
     val q = query.trim().lowercase()
     val shown = entries.filter { e ->
-        (category == null || e.category == category) &&
+        val installed = info[e.id] != null
+        (show == Show.ALL || (show == Show.INSTALLED) == installed) &&
+            (category == null || e.category == category) &&
             (q.isEmpty() || listOf(e.name, e.description, e.author, e.id).any { it.lowercase().contains(q) } || e.tags.any { it.lowercase().contains(q) })
     }.sortedWith(compareBy({ !it.official }, { it.name.lowercase() }))
 
@@ -81,8 +84,11 @@ fun GetPluginsScreen(app: App) {
         item {
             OutlinedTextField(query, { query = it }, placeholder = { Text("Search plugins") }, singleLine = true,
                 leadingIcon = { PhIcon(R.drawable.ph_binoculars, Color(0xFF9E9E9E), 20.dp) }, modifier = Modifier.fillMaxWidth())
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(top = 8.dp)) {
+                Show.entries.forEach { s -> FilterChip(show == s, { show = s }, label = { Text(s.label) }) }
+            }
             LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.padding(vertical = 8.dp)) {
-                item { FilterChip(category == null, { category = null }, label = { Text("All") }) }
+                item { FilterChip(category == null, { category = null }, label = { Text("All categories") }) }
                 items(Category.entries.filter { c -> entries.any { it.category == c } }) { c ->
                     FilterChip(category == c, { category = if (category == c) null else c }, label = { Text(c.label) },
                         leadingIcon = { PhIcon(c.icon, c.composeColor, 16.dp) })
@@ -101,7 +107,11 @@ fun GetPluginsScreen(app: App) {
         if (!loading && shown.isEmpty() && errors.isEmpty()) item { Text("No plugins match.", color = Color(0xFF9E9E9E), modifier = Modifier.padding(16.dp)) }
         items(shown, key = { "${it.repo}/${it.id}" }) { e ->
             val status = app.store.status(e).let { s -> if (s == EntryStatus.INSTALLED && info[e.id] == null) EntryStatus.AVAILABLE else s }
-            CatalogRow(e, status, busy[e.id]) {
+            CatalogRow(e, status, busy[e.id], onUninstall = {
+                app.registry.setEnabled(e.id, false)
+                app.store.remove(e.id)
+                busy.remove(e.id)
+            }) {
                 busy[e.id] = "Installing…"
                 scope.launch {
                     try {
@@ -120,7 +130,7 @@ fun GetPluginsScreen(app: App) {
 }
 
 @Composable
-private fun CatalogRow(e: CatalogEntry, status: EntryStatus, busy: String?, onInstall: () -> Unit) {
+private fun CatalogRow(e: CatalogEntry, status: EntryStatus, busy: String?, onUninstall: () -> Unit, onInstall: () -> Unit) {
     val c = e.category.composeColor
     Row(Modifier.fillMaxWidth().padding(vertical = 12.dp), verticalAlignment = Alignment.Top) {
         Box(Modifier.size(44.dp).clip(CircleShape).background(c.copy(alpha = 0.18f)), contentAlignment = Alignment.Center) { PhIcon(e.icon, c, 24.dp) }
@@ -137,11 +147,17 @@ private fun CatalogRow(e: CatalogEntry, status: EntryStatus, busy: String?, onIn
             if (e.repo != PluginStore.OFFICIAL_REPO) Text("From ${e.repo}", color = Color(0xFF7E7E7E), fontSize = 11.sp)
             busy?.let { Text(it, color = if (it.startsWith("Failed")) Color(0xFFFFB74D) else Color(0xFF9E9E9E), fontSize = 12.sp) }
         }
-        when (status) {
-            EntryStatus.AVAILABLE -> Button(onClick = onInstall, enabled = busy == null || busy.startsWith("Failed")) { Text("Install") }
-            EntryStatus.UPDATE -> Button(onClick = onInstall, enabled = busy == null || busy.startsWith("Failed")) { Text("Update") }
-            EntryStatus.INSTALLED -> Text("Installed", color = Color(0xFF81C784), fontSize = 13.sp, modifier = Modifier.padding(top = 10.dp))
-            EntryStatus.UNSUPPORTED -> Text("Needs app\nupdate", color = Color(0xFF9E9E9E), fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
+        val idle = busy == null || busy.startsWith("Failed")
+        Column(horizontalAlignment = Alignment.End) {
+            when (status) {
+                EntryStatus.AVAILABLE -> Button(onClick = onInstall, enabled = idle) { Text("Install") }
+                EntryStatus.UPDATE -> {
+                    Button(onClick = onInstall, enabled = idle) { Text("Update") }
+                    TextButton(onClick = onUninstall) { Text("Uninstall", color = Color(0xFFEF9A9A)) }
+                }
+                EntryStatus.INSTALLED -> OutlinedButton(onClick = onUninstall) { Text("Uninstall", color = Color(0xFFEF9A9A)) }
+                EntryStatus.UNSUPPORTED -> Text("Needs app\nupdate", color = Color(0xFF9E9E9E), fontSize = 12.sp, modifier = Modifier.padding(top = 6.dp))
+            }
         }
     }
 }
@@ -171,3 +187,6 @@ private fun Sources(app: App, sources: List<String>, onReload: () -> Unit) {
         TextButton(onClick = onReload) { Text("Check for updates") }
     }
 }
+
+/** Which catalogue entries to list. */
+private enum class Show(val label: String) { ALL("All"), AVAILABLE("Not installed"), INSTALLED("Installed") }
