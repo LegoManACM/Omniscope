@@ -19,13 +19,21 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 shrinks the APK from ~80 MB to something you can send as a file. Same (debug) key, so it updates in place.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
         }
     }
 
     buildFeatures {
         compose = true
+    }
+
+    // Compress the native libraries (maps, ML Kit) inside the APK: about half the download, unpacked once at install.
+    packaging {
+        jniLibs { useLegacyPackaging = true }
     }
 
     compileOptions {
