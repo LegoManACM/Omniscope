@@ -446,7 +446,7 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
                     val hit = boxes.firstOrNull { it.first.contains(p.x, p.y) }?.second
                     when {
                         hit != null -> app.opened.value = app.scan.itemFor(hit)
-                        target != null -> app.opened.value = target
+                        target != null -> app.opened.value = target?.let { withParcels(app, it, app.visibleItems.value) }
                     }
                 },
             )
@@ -615,7 +615,7 @@ fun ArScreen(app: App, topInset: Dp, onFilter: () -> Unit) {
                 androidx.compose.animation.AnimatedVisibility(visible = target != null, enter = fadeIn() + slideInVertically { it / 3 }, exit = fadeOut() + slideOutVertically { it / 3 }) {
                     var shown by remember { mutableStateOf<Item?>(null) }
                     target?.let { shown = it }
-                    shown?.let { ItemCard(app, it, fix) { app.opened.value = it } }
+                    shown?.let { s -> val e = remember(s, items) { withParcels(app, s, items) }; ItemCard(app, e, fix) { app.opened.value = e } }
                 }
             }
         }

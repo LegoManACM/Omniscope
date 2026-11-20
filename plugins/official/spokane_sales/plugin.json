@@ -1,0 +1,44 @@
+{
+  "format": 1,
+  "id": "spokane_sales",
+  "version": 1,
+  "name": "Property sales",
+  "description": "Recorded property sales near you since 2015: price and date, from Spokane County's open data. Spokane County, WA only. A building you aim at in AR shows its sale history.",
+  "author": "Omniscope",
+  "source": "Spokane County Assessor open data",
+  "category": "places",
+  "icon": "tag",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["parcel", "property", "sales", "spokane"],
+  "radius": {
+    "default": 300,
+    "min": 25,
+    "max": 1000
+  },
+  "hosts": ["gismo.spokanecounty.org"],
+  "request": {
+    "url": "https://gismo.spokanecounty.org/arcgis/rest/services/OpenData/Property/MapServer/identify?geometry={west},{south},{east},{north}&geometryType=esriGeometryEnvelope&sr=4326&layers=all:20,19,18,17,5,16,15,14,10,11,6,7&tolerance=0&mapExtent={west},{south},{east},{north}&imageDisplay=1000,1000,96&returnGeometry=true&maxAllowableOffset=0.00002&f=json"
+  },
+  "error": "$.error.message",
+  "items": "$.results[*]",
+  "limit": 800,
+  "item": {
+    "id": "$.attributes.excise_nbr || $.attributes.OBJECTID",
+    "title": "$.attributes.gross_sale_price | num | nonzero | thousands | prefix:'Sold for $'",
+    "subtitle": "$.attributes.document_date | date",
+    "lat": "$.geometry.rings | ringlat",
+    "lon": "$.geometry.rings | ringlon",
+    "fields": [
+      ["Sale price", "$.attributes.gross_sale_price | num | nonzero | thousands | prefix:$"],
+      ["Sale date", "$.attributes.document_date | date"],
+      ["Vacant land", "$.attributes.vacant_land_flag"],
+      ["Parcel number", "$.attributes.Parcel"],
+      ["Excise number", "$.attributes.excise_nbr"]
+    ],
+    "links": [
+      ["County property record", "https://cp.spokanecounty.org/SCOUT/propertyinformation/Summary.aspx?PID={$.attributes.Parcel}"]
+    ]
+  }
+}

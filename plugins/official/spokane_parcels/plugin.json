@@ -1,0 +1,48 @@
+{
+  "format": 1,
+  "id": "spokane_parcels",
+  "version": 1,
+  "name": "Property owners",
+  "description": "Who owns each parcel near you, from the Spokane County Assessor's public records: owner, mailing address, taxpayer, land value and use. Spokane County, WA only. Merged into buildings you aim at in AR.",
+  "author": "Omniscope",
+  "source": "Spokane County Assessor (SCOUT)",
+  "category": "places",
+  "icon": "house",
+  "cost": "free",
+  "preload": false,
+  "freshness": "static",
+  "tags": ["parcel", "property", "owner", "spokane"],
+  "radius": {
+    "default": 300,
+    "min": 25,
+    "max": 1500
+  },
+  "hosts": ["gismo.spokanecounty.org"],
+  "request": {
+    "url": "https://gismo.spokanecounty.org/arcgis/rest/services/Assessor/SCOUTSimple/MapServer/0/query?outFields=PID_NUM,owner_name,owner_address1,owner_city,owner_state,owner_zip,taxpayer_name,prop_use_desc,land_value,exmp_amt,asmt_year,site_address,site_city,acreage&geometry={lon},{lat}&geometryType=esriGeometryPoint&inSR=4326&distance={radius_m}&units=esriSRUnit_Meter&spatialRel=esriSpatialRelIntersects&returnGeometry=true&outSR=4326&maxAllowableOffset=0.00002&f=json"
+  },
+  "error": "$.error.message",
+  "items": "$.features[*]",
+  "limit": 500,
+  "item": {
+    "id": "$.attributes.PID_NUM",
+    "title": "$.attributes.site_address | titlecase || $.attributes.PID_NUM | prefix:'Parcel '",
+    "subtitle": "{$.attributes.owner_name | titlecase} · {$.attributes.prop_use_desc}",
+    "lat": "$.geometry.rings | ringlat",
+    "lon": "$.geometry.rings | ringlon",
+    "fields": [
+      ["Owner", "$.attributes.owner_name | titlecase"],
+      ["Owner mailing address", "{$.attributes.owner_address1 | titlecase}, {$.attributes.owner_city | titlecase} {$.attributes.owner_state} {$.attributes.owner_zip}"],
+      ["Taxpayer", "$.attributes.taxpayer_name | titlecase"],
+      ["Use", "$.attributes.prop_use_desc"],
+      ["Land value", "$.attributes.land_value | nonzero | thousands | prefix:$"],
+      ["Exemption", "$.attributes.exmp_amt | nonzero | thousands | prefix:$"],
+      ["Assessment year", "$.attributes.asmt_year"],
+      ["Acreage", "$.attributes.acreage | suffix: acres"],
+      ["Parcel number", "$.attributes.PID_NUM"]
+    ],
+    "links": [
+      ["County property record", "https://cp.spokanecounty.org/SCOUT/propertyinformation/Summary.aspx?PID={$.attributes.PID_NUM}"]
+    ]
+  }
+}

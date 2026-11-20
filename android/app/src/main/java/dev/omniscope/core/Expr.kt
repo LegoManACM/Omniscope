@@ -184,6 +184,9 @@ object Expr {
             "date" -> v?.let { toDate(it) }
             "localtime" -> v?.let { toLocalTime(it) }
             "wktlat" -> s()?.let { wkt(it)?.second }
+            "ringlat" -> ringCentre(v)?.second
+            "ringlon" -> ringCentre(v)?.first
+            "titlecase" -> s()?.lowercase()?.split(' ')?.joinToString(" ") { w -> w.replaceFirstChar { it.uppercase() } }
             "wktlon" -> s()?.let { wkt(it)?.first }
             "compass" -> n()?.let { compass[(((it % 360) + 360) % 360 / 45 + 0.5).toInt() % 8] }
             "url" -> s()?.let { if (it.startsWith("http://") || it.startsWith("https://")) it else "https://$it" }
@@ -200,7 +203,13 @@ object Expr {
     private fun toDate(v: Any): String? {
         val ms = when (v) { is Number -> v.toDouble(); is String -> v.trim().takeIf { t -> t.all { it.isDigit() } }?.toDoubleOrNull(); else -> null }
         if (ms != null) return Instant.ofEpochMilli(ms.toLong()).atOffset(ZoneOffset.UTC).toLocalDate().toString()
-        return format(v)?.take(10)
+        val text = format(v) ?: return null
+        // US style M/D/YYYY (as ArcGIS identify returns) to ISO, so dates sort.
+        Regex("""^(\d{1,2})/(\d{1,2})/(\d{4})""").find(text)?.let { m ->
+            val (mo, d, y) = m.destructured
+            return "%s-%02d-%02d".format(y, mo.toInt(), d.toInt())
+        }
+        return text.take(10)
     }
 
     /** An ISO date-time or epoch milliseconds to HH:mm in the phone's time zone. */
@@ -212,6 +221,23 @@ object Expr {
             else -> null
         } ?: return null
         return java.time.format.DateTimeFormatter.ofPattern("HH:mm").withZone(java.time.ZoneId.systemDefault()).format(instant)
+    }
+
+    /**
+     * The average of a polygon's outer ring, as (x, y) = (lon, lat). Takes ArcGIS `rings` / GeoJSON polygon
+     * coordinates ([[[x, y], …], …]) or a single ring ([[x, y], …]).
+     */
+    private fun ringCentre(v: Any?): Pair<Double, Double>? {
+        val outer = v as? JSONArray ?: return null
+        val ring = if (outer.optJSONArray(0)?.optJSONArray(0) != null) outer.getJSONArray(0) else outer
+        var n = ring.length()
+        if (n == 0) return null
+        // Closed rings repeat the first point at the end; don't count it twice.
+        val first = ring.optJSONArray(0); val last = ring.optJSONArray(n - 1)
+        if (n > 1 && first != null && last != null && first.optDouble(0) == last.optDouble(0) && first.optDouble(1) == last.optDouble(1)) n--
+        var x = 0.0; var y = 0.0
+        for (i in 0 until n) { val p = ring.optJSONArray(i) ?: return null; x += p.optDouble(0); y += p.optDouble(1) }
+        return x / n to y / n
     }
 
     /** "Point(lon lat)" (WKT, as Wikidata returns) to (lon, lat). */

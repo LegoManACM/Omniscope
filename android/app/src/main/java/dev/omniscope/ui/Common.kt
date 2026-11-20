@@ -73,6 +73,53 @@ fun enuFor(item: Item, fix: Fix?): Enu? {
     return Geo.enu(fix.lat, fix.lon, myAlt, item.lat!!, item.lon!!, targetAlt)
 }
 
+/**
+ * A building with the property records (plugins tagged "parcel") of the parcel it stands on: a parcel whose centre is
+ * inside the footprint, or else the nearest within about 35 m. One record per plugin; owner first.
+ */
+fun withParcels(app: App, building: Item, items: List<Item>): Item {
+    val shape = building.shape ?: return building
+    if (!building.hasPlace) return building
+    val parcels = items.filter { it.hasPlace && it.shape == null && "parcel" in app.registry.plugin(it.pluginId).tags }
+    if (parcels.isEmpty()) return building
+    val ring = shape.ring
+    fun inside(lat: Double, lon: Double): Boolean {
+        var c = false
+        val n = ring.size / 2
+        var j = n - 1
+        for (i in 0 until n) {
+            val yi = ring[2 * i]; val xi = ring[2 * i + 1]; val yj = ring[2 * j]; val xj = ring[2 * j + 1]
+            if ((yi > lat) != (yj > lat) && lon < (xj - xi) * (lat - yi) / (yj - yi) + xi) c = !c
+            j = i
+        }
+        return c
+    }
+    // Per plugin: every record inside the footprint, or else every record at the nearest parcel within ~35 m.
+    val groups = parcels.groupBy { it.pluginId }.mapNotNull { (_, list) ->
+        list.filter { inside(it.lat!!, it.lon!!) }.ifEmpty {
+            val nearest = list.minByOrNull { Geo.distanceM(building.lat!!, building.lon!!, it.lat!!, it.lon!!) } ?: return@mapNotNull null
+            if (Geo.distanceM(building.lat!!, building.lon!!, nearest.lat!!, nearest.lon!!) > 35) return@mapNotNull null
+            list.filter { Geo.distanceM(nearest.lat!!, nearest.lon!!, it.lat!!, it.lon!!) < 1.0 }
+        }.takeIf { it.isNotEmpty() }
+    }
+    if (groups.isEmpty()) return building
+    val all = groups.flatten()
+    // One record: its fields. Several (a sale history): one line each, "date: title", newest first.
+    val fields = groups.flatMap { g ->
+        if (g.size == 1) g.first().fields
+        else g.sortedByDescending { it.subtitle.orEmpty() }.map { (it.subtitle ?: "Record") to it.title }
+    }
+    val owner = all.flatMap { it.fields }.firstOrNull { it.first == "Owner" }?.second
+    val address = groups.firstOrNull { it.size == 1 }?.first()?.title
+    val generic = building.title == "Building" || building.title.startsWith("Building on ")
+    return building.copy(
+        title = if (generic && address != null) address else building.title,
+        subtitle = listOfNotNull(owner?.let { "Owner: $it" }, building.subtitle).joinToString(" · "),
+        fields = (fields + building.fields).distinctBy { it.first + it.second },
+        links = (all.flatMap { it.links } + building.links).distinctBy { it.second },
+    )
+}
+
 fun Item.distanceFrom(fix: Fix?): Double? =
     if (hasPlace && fix != null) Geo.distanceM(fix.lat, fix.lon, lat!!, lon!!) else null
 

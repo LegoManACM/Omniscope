@@ -831,6 +831,52 @@
       ]
     },
     {
+      "id": "spokane_parcels",
+      "name": "Property owners",
+      "version": 1,
+      "description": "Who owns each parcel near you, from the Spokane County Assessor's public records: owner, mailing address, taxpayer, land value and use. Spokane County, WA only. Merged into buildings you aim at in AR.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "house",
+      "cost": "free",
+      "tags": [
+        "parcel",
+        "property",
+        "owner",
+        "spokane"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/spokane_parcels/plugin.json",
+      "sha256": "20c7d6a8fbb02ccdb3f0646e6d2201b644d338c551dab53b6805fc02ada4ec15",
+      "hosts": [
+        "gismo.spokanecounty.org"
+      ]
+    },
+    {
+      "id": "spokane_sales",
+      "name": "Property sales",
+      "version": 1,
+      "description": "Recorded property sales near you since 2015: price and date, from Spokane County's open data. Spokane County, WA only. A building you aim at in AR shows its sale history.",
+      "author": "Omniscope",
+      "category": "places",
+      "icon": "tag",
+      "cost": "free",
+      "tags": [
+        "parcel",
+        "property",
+        "sales",
+        "spokane"
+      ],
+      "preload": false,
+      "official": true,
+      "path": "plugins/official/spokane_sales/plugin.json",
+      "sha256": "1d7639c68c2e2f2d8759e6f3d819f847683d7f7d722129a53068332ba648c2ed",
+      "hosts": [
+        "gismo.spokanecounty.org"
+      ]
+    },
+    {
       "id": "sun_times",
       "name": "Sunrise & sunset",
       "version": 1,

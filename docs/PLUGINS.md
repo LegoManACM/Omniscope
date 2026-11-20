@@ -133,6 +133,8 @@ Pipes:
 | `date` | Milliseconds since 1970 or an ISO date to `YYYY-MM-DD`. |
 | `localtime` | An ISO date-time (or milliseconds) to `HH:mm` in the phone's time zone. |
 | `wktlat`, `wktlon` | Latitude or longitude from WKT `Point(lon lat)` text (Wikidata returns these). |
+| `ringlat`, `ringlon` | The centre of a polygon's outer ring (ArcGIS `rings` or GeoJSON coordinates). |
+| `titlecase` | `MAIN ST` to `Main St` (for all-caps government data). |
 | `compass` | Degrees to `N`, `NE`, … |
 | `url` | Adds `https://` if a website has no scheme. |
 | `wikiurl` | An OSM `wikipedia=en:Title` tag to an article link. |
@@ -161,6 +163,8 @@ Pipes:
 - **Only what you need.** List only the hosts you call. Don't send anything the API doesn't need.
 - **Respect the API's terms.** Use `freshness` and a sensible default `radius` so the plugin doesn't hammer a free
   service; mention rate limits in the description.
+- Plugins tagged `parcel` (property records) are merged into the building you aim at in AR when the parcel's centre
+  is inside its footprint or within about 35 m.
 - Official plugins (`plugins/official/`) ship with the app and are maintained in this repo. `native` plugins (code in
   the app) can only be official.
 
